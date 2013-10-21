@@ -114,7 +114,7 @@ function createChartOfCpu(filePath) {
           text: 'Time'
         },
         categories: times,
-        tickInterval: 30
+        tickInterval: parseInt(times.length / 10)
       },
       yAxis: {
         title: {
@@ -251,7 +251,7 @@ function createChartOfMemory(filePath) {
           text: 'Time'
         },
         categories: times,
-        tickInterval: 30
+        tickInterval: parseInt(times.length / 10)
       },
       yAxis: {
         title: {
@@ -335,7 +335,7 @@ function createChartOfLoadavg(filePath) {
           text: 'Time'
         },
         categories: times,
-        tickInterval: 30      
+        tickInterval: parseInt(times.length / 10)
       },
       yAxis: {
         title: {
@@ -437,7 +437,7 @@ function createChartOfNetwork(filePath) {
           text: 'Time'
         },
         categories: times,
-        tickInterval: 30      
+        tickInterval: parseInt(times.length / 10)
       },
       yAxis: {
         title: {
@@ -522,7 +522,7 @@ function createChartOfDiskIO(filePath) {
       },
       xAxis: {
         categories: times,
-        tickInterval: 30      
+        tickInterval: parseInt(times.length / 10)
       },
       yAxis: {
         title: {
@@ -601,7 +601,7 @@ function createChartOfDiskUsage(filePath) {
           text: 'Time'
         },
         categories: times,
-        tickInterval: 30      
+        tickInterval: parseInt(times.length / 10)
       },
       yAxis: {
         title: {
@@ -687,7 +687,7 @@ function createChartOfDiskUtil(filePath) {
           text: 'Time'
         },
         categories: times,
-        tickInterval: 30      
+        tickInterval: parseInt(times.length / 10)
       },
       yAxis: {
         title: {
