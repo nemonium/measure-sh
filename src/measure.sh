@@ -10,7 +10,7 @@ Usage:
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
                  For example, '$(cd $(dirname $0);pwd)/result-`date +%Y%m%d%H%M%S`'
     -i <arg> : Specify interval (range 1 .. 60)
-               Default : 1
+               Default : 5
     -t <arg> : Specify measure term
     -v       : Verbose
     -h       : Get help
@@ -21,7 +21,7 @@ exit 0
 
 UTIL_DIR=$(cd $(dirname $0);pwd)
 RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
-INTERVAL=1
+INTERVAL=5
 
 while getopts "o:i:t:hv" OPT; do
   case ${OPT} in
