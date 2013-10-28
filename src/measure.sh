@@ -4,7 +4,7 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-o directory] [-i interval] [-t term] [-h] [-v]
+  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
 
     -o <arg> : Specify results directory
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
@@ -12,6 +12,8 @@ Usage:
     -i <arg> : Specify interval (range 1 .. 60)
                Default : 5
     -t <arg> : Specify measure term
+    -e <arg> : End time.
+               See the d option of the date command for format.
     -v       : Verbose
     -h       : Get help
 
@@ -23,11 +25,13 @@ UTIL_DIR=$(cd $(dirname $0);pwd)
 RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
 INTERVAL=5
 
-while getopts "o:i:t:hv" OPT; do
+while getopts "o:i:t:e:hv" OPT; do
   case ${OPT} in
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
+    e) END_TIME="`date -d ${OPTARG} '+%s' 2>/dev/null`"
+       test "${END_TIME}" == "" && usage;;
     v) VERBOSE=1;;
     h|:|\?) usage;;
   esac
@@ -73,7 +77,7 @@ LIST_DEV=(`iostat -xd | \
 LIST_MNT=(`mount | awk '{print $3}'`)
 
 ### VARBOSE
-S_TIME=`date '+%s'`
+s_time=`date '+%s'`
 test ${VERBOSE} && cat <<EOF
 Results directory : ${RESULT_DIR}
 Measure interval  : ${INTERVAL} sec
@@ -83,7 +87,11 @@ Interfaces        : ${LIST_IF[@]}
 IO-devices        : ${LIST_DEV[@]}
 Mounted           : ${LIST_MNT[@]}
 
-Start time        : `date -d "1970/01/01 UTC ${S_TIME} sec"`
+Start time        : `date --date "@${s_time}"`
+EOF
+
+test ${VERBOSE} && test ${END_TIME} && cat << EOF
+End time          : `date --date "@${END_TIME}"`
 EOF
 
 sh ${UTIL_DIR}/create_chart.sh -o ${RESULT_DIR} \
@@ -97,18 +105,19 @@ do
   sleep ${INTERVAL}
   time=`date "+%Y-%m-%d %H:%M:%S"`
 
-  E_TIME=`date '+%s'`
-  ELAPSED=$((${E_TIME} - ${S_TIME}))
+  e_time=`date '+%s'`
+  elapsed=$((${e_time} - ${s_time}))
 
+  test ${END_TIME} && test `date '+%s'` -gt ${END_TIME} && echo "" && exit 0
   test ${MEASURE_TERM} && \
-    test ${ELAPSED} -gt ${MEASURE_TERM} && \
+    test ${elapsed} -gt ${MEASURE_TERM} && \
     echo "" && \
     exit 0
 
   ### VARBOSE
   test ${VERBOSE} && \
-    NOW=`date -d "1970/01/01 UTC ${E_TIME} sec"` && \
-    echo -ne "\rElapsed time      : ${NOW} (${ELAPSED} sec)"
+    now=`date -d "1970/01/01 UTC ${e_time} sec"` && \
+    echo -ne "\rElapsed time      : ${now} (${elapsed} sec)"
 
   ### MEMORY
   sh ${UTIL_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DIR}/memory.csv &
