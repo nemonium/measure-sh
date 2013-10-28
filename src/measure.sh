@@ -117,7 +117,7 @@ do
   ### VARBOSE
   test ${VERBOSE} && \
     now=`date -d "1970/01/01 UTC ${e_time} sec"` && \
-    echo -ne "\rElapsed time      : ${now} (${elapsed} sec)"
+    echo -ne "\rElapsed time      : ${now} (${elapsed} sec)" 2>/dev/null
 
   ### MEMORY
   sh ${UTIL_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DIR}/memory.csv &
