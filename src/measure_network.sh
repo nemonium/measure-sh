@@ -1,5 +1,27 @@
 #!/bin/bash
+#===================================================================================
+#
+#         FILE: measure_network.sh
+#
+#        USAGE: measure_network.sh [-d delimiter] [-t time] [-i Interface] [-H] [-h]
+#
+#  DESCRIPTION: Measures the Network torrific
+#
+#      OPTIONS: see function ’usage’ below
+# REQUIREMENTS: ---
+#         BUGS: ---
+#        NOTES: ---
+#       AUTHOR: Nemonium
+#      COMPANY: ---
+#      VERSION: 0.9
+#      CREATED: 30.10.2013
+#     REVISION: ---
+#===================================================================================
 
+#===  FUNCTION  ================================================================
+#         NAME: usage
+#  DESCRIPTION: Display usage information for this script.
+#===============================================================================
 function usage() {
 cat << EOF
 Usage:
@@ -16,6 +38,9 @@ EOF
 exit 0
 }
 
+#-------------------------------------------------------------------------------
+# Parameter check
+#-------------------------------------------------------------------------------
 while getopts "d:t:i:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
@@ -28,6 +53,9 @@ done
 
 shift $(( $OPTIND - 1 ))
 
+#-------------------------------------------------------------------------------
+# Return the Header
+#-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
   netstat -I"${I:-lo}" | \
     grep ^Iface | \
@@ -37,6 +65,9 @@ if [ "${HEAD}" ]; then
   exit 0
 fi
 
+#-------------------------------------------------------------------------------
+# Measure
+#-------------------------------------------------------------------------------
 netstat -I"${I:-lo}" | \
   grep "^${I:-lo}" | \
   awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
