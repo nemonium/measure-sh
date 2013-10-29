@@ -1,5 +1,27 @@
 #!/bin/bash
+#===================================================================================
+#
+#         FILE: measure_memory.sh
+#
+#        USAGE: measure_memory.sh [-d delimiter] [-t time] [-H] [-h]
+#
+#  DESCRIPTION: Measures the Memory
+#
+#      OPTIONS: see function ’usage’ below
+# REQUIREMENTS: ---
+#         BUGS: ---
+#        NOTES: ---
+#       AUTHOR: Nemonium
+#      COMPANY: ---
+#      VERSION: 0.9
+#      CREATED: 30.10.2013
+#     REVISION: ---
+#===================================================================================
 
+#===  FUNCTION  ================================================================
+#         NAME: usage
+#  DESCRIPTION: Display usage information for this script.
+#===============================================================================
 function usage() {
 cat << EOF
 Usage:
@@ -15,6 +37,9 @@ EOF
 exit 0
 }
 
+#-------------------------------------------------------------------------------
+# Parameter check
+#-------------------------------------------------------------------------------
 while getopts "d:t:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
@@ -26,6 +51,9 @@ done
 
 shift $(( $OPTIND - 1 ))
 
+#-------------------------------------------------------------------------------
+# Return the Header
+#-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
   vmstat -s | \
     awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
@@ -45,6 +73,9 @@ if [ "${HEAD}" ]; then
   exit 0
 fi
 
+#-------------------------------------------------------------------------------
+# Measure
+#-------------------------------------------------------------------------------
 vmstat -s | \
   awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
     BEGIN {
