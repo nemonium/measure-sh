@@ -1,5 +1,27 @@
 #!/bin/bash
+#===================================================================================
+#
+#         FILE: create_chart.sh
+#
+#        USAGE: create_chart.sh [-o directory] [-c cpuList] [-i i/fList] [-d deviceList] [-m mountedList] [-h]
+#
+#  DESCRIPTION: Create Visualize Tool
+#
+#      OPTIONS: see function ’usage’ below
+# REQUIREMENTS: ---
+#         BUGS: ---
+#        NOTES: ---
+#       AUTHOR: Nemonium
+#      COMPANY: ---
+#      VERSION: 0.9
+#      CREATED: 30.10.2013
+#     REVISION: ---
+#===================================================================================
 
+#===  FUNCTION  ================================================================
+#         NAME: usage
+#  DESCRIPTION: Display usage information for this script.
+#===============================================================================
 function usage() {
 cat << EOF
 Usage:
