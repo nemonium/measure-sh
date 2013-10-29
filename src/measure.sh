@@ -1,5 +1,27 @@
 #!/bin/bash
+#===================================================================================
+#
+#         FILE: measure.sh
+#
+#        USAGE: measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
+#
+#  DESCRIPTION: Manage each performance measurement script.
+#
+#      OPTIONS: see function ’usage’ below
+# REQUIREMENTS: ---
+#         BUGS: ---
+#        NOTES: ---
+#       AUTHOR: Nemonium
+#      COMPANY: ---
+#      VERSION: 0.9
+#      CREATED: 30.10.2013
+#     REVISION: ---
+#===================================================================================
 
+#===  FUNCTION  ================================================================
+#         NAME: usage
+#  DESCRIPTION: Display usage information for this script.
+#===============================================================================
 function usage() {
 cat << EOF
 Usage:
@@ -25,6 +47,9 @@ UTIL_DIR=$(cd $(dirname $0);pwd)
 RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
 INTERVAL=5
 
+#-------------------------------------------------------------------------------
+# Parameter check
+#-------------------------------------------------------------------------------
 while getopts "o:i:t:e:hv" OPT; do
   case ${OPT} in
     o) RESULT_DIR="${OPTARG}";;
@@ -39,7 +64,9 @@ done
 
 shift $(( $OPTIND - 1 ))
 
-### Validateion
+#-------------------------------------------------------------------------------
+# Validation check
+#-------------------------------------------------------------------------------
 test `expr "${INTERVAL}" : '[0-9]*$'` -eq 0 && usage
 test ${INTERVAL} -lt 1  && usage
 test ${INTERVAL} -gt 60 && usage
@@ -47,7 +74,9 @@ test "${MEASURE_TERM}" && test `expr "${MEASURE_TERM}" : '[0-9]*$'` -eq 0 && usa
 
 test ! -d ${RESULT_DIR} && mkdir -p ${RESULT_DIR}
 
-### CPU LIST
+#-------------------------------------------------------------------------------
+# Create CPU list
+#-------------------------------------------------------------------------------
 LIST_CPU=(`cat /proc/cpuinfo | \
   grep ^processor | \
   awk -v FS=: ' \
@@ -58,12 +87,16 @@ LIST_CPU=(`cat /proc/cpuinfo | \
     }
   '`)
 
-### INTERFACE LIST
+#-------------------------------------------------------------------------------
+# Create Interface list
+#-------------------------------------------------------------------------------
 LIST_IF=(`ls /proc/sys/net/ipv4/conf/ | \
   grep -v all | \
   grep -v default`)
 
-### DEVICE LIST
+#-------------------------------------------------------------------------------
+# Create Device list
+#-------------------------------------------------------------------------------
 S_NR=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
 E_NR=`iostat -xd  | wc -l`
 LIST_DEV=(`iostat -xd | \
@@ -73,10 +106,14 @@ LIST_DEV=(`iostat -xd | \
     }' | \
   grep -v '^$'`)
 
-### MOUNTED LIST
+#-------------------------------------------------------------------------------
+# Create Mounted list
+#-------------------------------------------------------------------------------
 LIST_MNT=(`mount | awk '{print $3}'`)
 
-### VARBOSE
+#-------------------------------------------------------------------------------
+# Vabose
+#-------------------------------------------------------------------------------
 s_time=`date '+%s'`
 test ${VERBOSE} && cat <<EOF
 Results directory : ${RESULT_DIR}
@@ -94,6 +131,9 @@ test ${VERBOSE} && test ${END_TIME} && cat << EOF
 End time          : `date --date "@${END_TIME}"`
 EOF
 
+#-------------------------------------------------------------------------------
+# Create Visualize Tool
+#-------------------------------------------------------------------------------
 sh ${UTIL_DIR}/create_chart.sh -o ${RESULT_DIR} \
   -c "${LIST_CPU[*]}" \
   -i "${LIST_IF[*]}" \
@@ -108,43 +148,63 @@ do
   e_time=`date '+%s'`
   elapsed=$((${e_time} - ${s_time}))
 
-  test ${END_TIME} && test `date '+%s'` -gt ${END_TIME} && echo "" && exit 0
-  test ${MEASURE_TERM} && \
-    test ${elapsed} -gt ${MEASURE_TERM} && \
-    echo "" && \
-    exit 0
+  #-----------------------------------------------------------------------------
+  # If there is a specified for the end time, make the check
+  #-----------------------------------------------------------------------------
+  test ${END_TIME} && \
+    test `date '+%s'` -gt ${END_TIME} && echo "" && exit 0
 
-  ### VARBOSE
+  #-----------------------------------------------------------------------------
+  # If there is a specified number of measurements, make the check
+  #-----------------------------------------------------------------------------
+  test ${MEASURE_TERM} && \
+    test ${elapsed} -gt ${MEASURE_TERM} && echo "" && exit 0
+
+  #-----------------------------------------------------------------------------
+  # Outputs elapsed time
+  #-----------------------------------------------------------------------------
   test ${VERBOSE} && \
-    now=`date -d "1970/01/01 UTC ${e_time} sec"` && \
+    now=`date --date "@${e_time}"` && \
     echo -ne "\rElapsed time      : ${now} (${elapsed} sec)" 2>/dev/null
 
-  ### MEMORY
+  #-----------------------------------------------------------------------------
+  # Measure the usage of memory
+  #-----------------------------------------------------------------------------
   sh ${UTIL_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DIR}/memory.csv &
 
-  ### CPU
+  #-----------------------------------------------------------------------------
+  # Measure the usage of CPU
+  #-----------------------------------------------------------------------------
   sh ${UTIL_DIR}/measure_cpu.sh -d, -t "$time" >> ${RESULT_DIR}/cpu.all.csv &
   for c in ${LIST_CPU[@]}
   do
     sh ${UTIL_DIR}/measure_cpu.sh -c ${c} -d, -t "$time" >> ${RESULT_DIR}/cpu.${c}.csv &
   done
 
-  ### LOAD_AVERAGE
+  #-----------------------------------------------------------------------------
+  # Load Average
+  #-----------------------------------------------------------------------------
   sh ${UTIL_DIR}/measure_loadavg.sh -d, -t "$time" >> ${RESULT_DIR}/loadavg.csv &
 
-  ### NETWORK
+  #-----------------------------------------------------------------------------
+  # Measure the traffic of the Network
+  #-----------------------------------------------------------------------------
   for i in ${LIST_IF[@]}
   do
     sh ${UTIL_DIR}/measure_network.sh -i ${i} -d, -t "$time" >> ${RESULT_DIR}/network.${i}.csv &
   done
 
-  ### DISK_IO
+  #-----------------------------------------------------------------------------
+  # Disk IO
+  #-----------------------------------------------------------------------------
   for i in ${LIST_DEV[@]}
   do
     sh ${UTIL_DIR}/measure_diskio.sh -d, -t "$time" ${i} >> ${RESULT_DIR}/diskio.${i//\//_S_}.csv &
   done
 
-  ### DISK_USE
+  #-----------------------------------------------------------------------------
+  # Disk Use
+  #-----------------------------------------------------------------------------
   for i in ${LIST_MNT[@]}
   do
     sh ${UTIL_DIR}/measure_diskuse.sh -d, -t "$time" ${i} >> ${RESULT_DIR}/diskuse.${i//\//_S_}.csv &
