@@ -1,5 +1,27 @@
 #!/bin/bash
+#===================================================================================
+#
+#         FILE: measure_loadavg.sh
+#
+#        USAGE: measure_loadavg.sh [-d delimiter] [-t time] [-H] [-h]
+#
+#  DESCRIPTION: Measures the Load Average
+#
+#      OPTIONS: see function ’usage’ below
+# REQUIREMENTS: ---
+#         BUGS: ---
+#        NOTES: ---
+#       AUTHOR: Nemonium
+#      COMPANY: ---
+#      VERSION: 0.9
+#      CREATED: 30.10.2013
+#     REVISION: ---
+#===================================================================================
 
+#===  FUNCTION  ================================================================
+#         NAME: usage
+#  DESCRIPTION: Display usage information for this script.
+#===============================================================================
 function usage() {
 cat << EOF
 Usage:
@@ -15,6 +37,9 @@ EOF
 exit 0
 }
 
+#-------------------------------------------------------------------------------
+# Parameter check
+#-------------------------------------------------------------------------------
 while getopts "d:t:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
@@ -26,11 +51,17 @@ done
 
 shift $(( $OPTIND - 1 ))
 
+#-------------------------------------------------------------------------------
+# Return the Header
+#-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
   echo -e "Time${D:-\t}1min${D:-\t}5min${D:-\t}15min"
   exit 0
 fi
 
+#-------------------------------------------------------------------------------
+# Measure
+#-------------------------------------------------------------------------------
 cat /proc/loadavg | \
   awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
     { print TIME, $1, $2, $3 }
