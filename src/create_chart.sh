@@ -41,13 +41,11 @@ EOF
 exit 0
 }
 
-function addScript() {
-  val=`echo $@`
-  idx=`grep -n '#####SCRIPT(E)#####' ${RESULT_DIR}/measure.html  | cut -d: -f1`
-  sed -i -e "${idx}i${val}" ${RESULT_DIR}/measure.html
-}
-
-function addButton() {
+#===  FUNCTION  ================================================================
+#         NAME: add_button
+#  DESCRIPTION: Add a button to the HTML file.
+#===============================================================================
+function add_button() {
   val=`echo $@`
   idx=`grep -n '#####BUTTON(E)#####' ${RESULT_DIR}/measure.html  | cut -d: -f1`
   sed -i -e "${idx}i${val}" ${RESULT_DIR}/measure.html
@@ -56,6 +54,9 @@ function addButton() {
 UTIL_DIR=$(cd $(dirname $0);pwd)
 RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
 
+#-------------------------------------------------------------------------------
+# Parameter check
+#-------------------------------------------------------------------------------
 while getopts "o:c:i:d:m:h" OPT; do
   case ${OPT} in
     o) RESULT_DIR="${OPTARG}";;
@@ -74,59 +75,57 @@ test ! -d ${RESULT_DIR} && mkdir -p ${RESULT_DIR}
 cp -p ${UTIL_DIR}/html/measure.html ${RESULT_DIR}
 cp -p ${UTIL_DIR}/html/measure.js   ${RESULT_DIR}
 
-### Javascript
-addScript '$("#memory").click(function() { createChartOfMemory("memory.csv"); });'
-addScript '$("#cpu_all").click(function() { createChartOfCpu("cpu.all.csv"); });'
+#-------------------------------------------------------------------------------
+# Add a button for viewing memory measure results
+#-------------------------------------------------------------------------------
+add_button '<input class="btn_mem" type="button" src="memory.csv" value="Memory" />'
+
+#-------------------------------------------------------------------------------
+# Add a button for viewing CPU measure results
+#-------------------------------------------------------------------------------
+add_button '<input class="btn_cpu" type="button" src="cpu.all.csv" value="Cpu - all" />'
 for i in ${LIST_CPU[@]}
 do
-  addScript `echo '$("#cpu_###").click(function() { createChartOfCpu("cpu.###.csv"); });' | sed "s/###/$i/g"`
+  add_button `echo '<input class="btn_cpu" type="button" src="cpu.###.csv" value="Cpu - ###" />' | sed "s/###/$i/g"`
 done
-addScript '$("#loadavg").click(function() { createChartOfLoadavg("loadavg.csv"); });'
+
+#-------------------------------------------------------------------------------
+# Add a button for viewing Load Average measure results
+#-------------------------------------------------------------------------------
+add_button '<input class="btn_loadavg" type="button" src="loadavg.csv" value="LoadAverage" />'
+
+#-------------------------------------------------------------------------------
+# Add a button for viewing Network Traffic measure results
+#-------------------------------------------------------------------------------
 for i in ${LIST_IF[@]}
 do
-  addScript `echo '$("#network_###").click(function() { createChartOfNetwork("network.###.csv"); });' | sed "s/###/$i/g"`
+  add_button `echo '<input class="btn_network" type="button" src="network.###.csv" value="Network - ###" />' | sed "s/###/$i/g"`
 done
+
+#-------------------------------------------------------------------------------
+# Add a button for viewing Disk IO measure results
+#-------------------------------------------------------------------------------
 for i in ${LIST_DEV[@]}
 do
-  addScript `echo '$("#diskio_###").click(function() { createChartOfDiskIO("diskio.###.csv"); });' | sed "s/###/$i/g"`
-  addScript `echo '$("#diskutil_###").click(function() { createChartOfDiskUtil("diskio.###.csv"); });' | sed "s/###/$i/g"`
+  add_button `echo '<input class="btn_diskio" type="button" src="diskio.###.csv" value="DiskIO - ###" />' | sed "s/###/$i/g"`
 done
+
+#-------------------------------------------------------------------------------
+# Add a button for viewing Disk Util measure results
+#-------------------------------------------------------------------------------
+for i in ${LIST_DEV[@]}
+do
+  add_button `echo '<input class="btn_diskutil" type="button" src="diskio.###.csv" value="DiskUtil - ###" />' | sed "s/###/$i/g"`
+done
+
+#-------------------------------------------------------------------------------
+# Add a button for viewing Disk Usage measure results
+#-------------------------------------------------------------------------------
 for i in ${LIST_MNT[@]}
 do
-  addScript `echo '$("#diskuse_###").click(function() { createChartOfDiskUsage("diskuse.%%%.csv"); });' | \
-    sed "s/###/${i//\//}/g" | \
-    sed "s/%%%/${i//\//\\_S_}/g"`
-done
-
-### Html
-addButton '<input id="memory" type="button" value="Memory" />'
-addButton '<input id="cpu_all" type="button" value="Cpu - all" />'
-
-for i in ${LIST_CPU[@]}
-do
-  addButton `echo '<input id="cpu_###" type="button" value="Cpu - ###" />' | sed "s/###/$i/g"`
-done
-addButton '<input id="loadavg" type="button" value="LoadAverage" />'
-
-for i in ${LIST_IF[@]}
-do
-  addButton `echo '<input id="network_###" type="button" value="Network - ###" />' | sed "s/###/$i/g"`
-done
-
-for i in ${LIST_DEV[@]}
-do
-  addButton `echo '<input id="diskio_###" type="button" value="DiskIO - ###" />' | sed "s/###/$i/g"`
-done
-
-for i in ${LIST_DEV[@]}
-do
-  addButton `echo '<input id="diskutil_###" type="button" value="DiskUtil - ###" />' | sed "s/###/$i/g"`
-done
-
-for i in ${LIST_MNT[@]}
-do
-  addButton `echo '<input id="diskuse_###" type="button" value="DiskUsage - %%%" />' | \
-    sed "s/###/${i//\//}/g" | \
+  filename=`echo 'diskuse.%%%.csv' | sed "s/%%%/${i//\//\\_S_}/g"`
+  add_button `echo '<input class="btn_diskuse" type="button" src="FILE" value="DiskUsage - %%%" />' | \
+    sed "s/FILE/${filename}/g" | \
     sed "s/%%%/${i//\//\\/}/g"`
 done
 
