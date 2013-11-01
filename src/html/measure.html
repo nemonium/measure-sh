@@ -6,8 +6,34 @@
     <script type="text/javascript" src="measure.js"></script>
     <script type="text/javascript">
     $(function() {
-      /* #####SCRIPT(S)##### */
-      /* #####SCRIPT(E)##### */
+      $(".btn_mem").click(function() {
+        src = $(this).attr("src");
+        createChartOfMemory(src);
+      });
+      $(".btn_cpu").click(function() {
+        src = $(this).attr("src");
+        createChartOfCpu(src);
+      });
+      $(".btn_loadavg").click(function() {
+        src = $(this).attr("src");
+        createChartOfLoadavg(src);
+      });
+      $(".btn_network").click(function() {
+        src = $(this).attr("src");
+        createChartOfNetwork(src);
+      });
+      $(".btn_diskio").click(function() {
+        src = $(this).attr("src");
+        createChartOfDiskIO(src);
+      });
+      $(".btn_diskutil").click(function() {
+        src = $(this).attr("src");
+        createChartOfDiskUtil(src);
+      });
+      $(".btn_diskuse").click(function() {
+        src = $(this).attr("src");
+        createChartOfDiskUsage(src);
+      });
     });
     </script>
   </head>
