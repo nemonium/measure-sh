@@ -8,14 +8,7 @@
 #  DESCRIPTION: Measures the Network torrific
 #
 #      OPTIONS: see function ’usage’ below
-# REQUIREMENTS: ---
-#         BUGS: ---
-#        NOTES: ---
-#       AUTHOR: Nemonium
-#      COMPANY: ---
-#      VERSION: 0.9
-#      CREATED: 30.10.2013
-#     REVISION: ---
+#
 #===================================================================================
 
 #===  FUNCTION  ================================================================
