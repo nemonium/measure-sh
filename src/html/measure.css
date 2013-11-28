@@ -1,0 +1,16 @@
+
+body, input {
+  font-family: monospace;
+}
+
+.measure_title {
+  width:   100px;
+  display: inline-block;
+}
+
+.measure_container {
+  min-width: 300px;
+  height:    600px;
+  margin:    0 auto;
+  display:   none;
+}
