@@ -8,38 +8,121 @@
     $(function() {
       $(".btn_mem").click(function() {
         src = $(this).attr("src");
-        createChartOfMemory(src);
+        targetId = $(this).attr("target");
+        if ($("#" + targetId).is(':visible')) {
+          $("#" + targetId).hide();
+        } else {
+          $("#" + targetId).show();
+          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+            createChartOfMemory(src, targetId);
+          }
+        }
       });
       $(".btn_cpu").click(function() {
         src = $(this).attr("src");
-        createChartOfCpu(src);
+        targetId = $(this).attr("target");
+        if ($("#" + targetId).is(':visible')) {
+          $("#" + targetId).hide();
+        } else {
+          $("#" + targetId).show();
+          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+            createChartOfCpu(src, targetId);
+          }
+        }
       });
       $(".btn_loadavg").click(function() {
         src = $(this).attr("src");
-        createChartOfLoadavg(src);
+        targetId = $(this).attr("target");
+        if ($("#" + targetId).is(':visible')) {
+          $("#" + targetId).hide();
+        } else {
+          $("#" + targetId).show();
+          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+            createChartOfLoadavg(src, targetId);
+          }
+        }
       });
       $(".btn_network").click(function() {
         src = $(this).attr("src");
-        createChartOfNetwork(src);
+        targetId = $(this).attr("target");
+        if ($("#" + targetId).is(':visible')) {
+          $("#" + targetId).hide();
+        } else {
+          $("#" + targetId).show();
+          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+            createChartOfNetwork(src, targetId);
+          }
+        }
       });
       $(".btn_diskio").click(function() {
         src = $(this).attr("src");
-        createChartOfDiskIO(src);
+        targetId = $(this).attr("target");
+        if ($("#" + targetId).is(':visible')) {
+          $("#" + targetId).hide();
+        } else {
+          $("#" + targetId).show();
+          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+            createChartOfDiskIO(src, targetId);
+          }
+        }
       });
       $(".btn_diskutil").click(function() {
         src = $(this).attr("src");
-        createChartOfDiskUtil(src);
+        targetId = $(this).attr("target");
+        if ($("#" + targetId).is(':visible')) {
+          $("#" + targetId).hide();
+        } else {
+          $("#" + targetId).show();
+          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+            createChartOfDiskUtil(src, targetId);
+          }
+        }
       });
       $(".btn_diskuse").click(function() {
         src = $(this).attr("src");
-        createChartOfDiskUsage(src);
+        targetId = $(this).attr("target");
+        if ($("#" + targetId).is(':visible')) {
+          $("#" + targetId).hide();
+        } else {
+          $("#" + targetId).show();
+          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+            createChartOfDiskUsage(src, targetId);
+          }
+        }
       });
     });
     </script>
+    <link href="measure.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <!-- #####BUTTON(S)##### -->
-    <!-- #####BUTTON(E)##### -->
-    <div id="container" style="min-width: 300px; height: 600px; margin: 0 auto"></div>
+    <div>
+      <span class="measure_title">Memory</span>
+      <!-- ###MEMORY### -->
+    </div>
+    <div>
+      <span class="measure_title">Cpu</span>
+      <!-- ###CPU### -->
+    </div>
+    <div>
+      <span class="measure_title">LoadAverage</span>
+      <!-- ###LOAD_AVERAGE### -->
+    </div>
+    <div>
+      <span class="measure_title">Network</span>
+      <!-- ###NETWORK### -->
+    </div>
+    <div>
+      <span class="measure_title">DiskIO</span>
+      <!-- ###DISK_IO### -->
+    </div>
+    <div>
+      <span class="measure_title">DiskUtil</span>
+      <!-- ###DISK_UTIL### -->
+    </div>
+    <div>
+      <span class="measure_title">DiskUsage</span>
+      <!-- ###DISK_USAGE### -->
+    </div>
+    <!-- ###CONTAINER### -->
   </body>
 </html>
