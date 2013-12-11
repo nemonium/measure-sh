@@ -55,7 +55,7 @@ while getopts "o:i:t:e:hv" OPT; do
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
-    e) END_TIME="`date -d ${OPTARG} '+%s' 2>/dev/null`"
+    e) END_TIME="`date -d "${OPTARG}" '+%s' 2>/dev/null`"
        test "${END_TIME}" == "" && usage;;
     v) VERBOSE=1;;
     h|:|\?) usage;;
