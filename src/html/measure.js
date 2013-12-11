@@ -49,7 +49,7 @@ function doOrderGuaranteedAjax(ajaxOptionArray, allCompleteHandler){
   $.ajax(opts);
 }
 
-function createChartOfCpu(filePath) {
+function createChartOfCpu(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -99,7 +99,7 @@ function createChartOfCpu(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'area'
       },
@@ -158,7 +158,7 @@ function createChartOfCpu(filePath) {
   });
 }
 
-function createChartOfMemory(filePath) {
+function createChartOfMemory(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -236,7 +236,7 @@ function createChartOfMemory(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'area'
       },
@@ -289,7 +289,7 @@ function createChartOfMemory(filePath) {
   });
 }
 
-function createChartOfLoadavg(filePath) {
+function createChartOfLoadavg(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -320,7 +320,7 @@ function createChartOfLoadavg(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -372,7 +372,7 @@ function createChartOfLoadavg(filePath) {
   });
 }
 
-function createChartOfNetwork(filePath) {
+function createChartOfNetwork(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -422,7 +422,7 @@ function createChartOfNetwork(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -473,7 +473,7 @@ function createChartOfNetwork(filePath) {
   });
 }
 
-function createChartOfDiskIO(filePath) {
+function createChartOfDiskIO(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -510,7 +510,7 @@ function createChartOfDiskIO(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -558,7 +558,7 @@ function createChartOfDiskIO(filePath) {
   });
 }
 
-function createChartOfDiskUsage(filePath) {
+function createChartOfDiskUsage(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -586,7 +586,7 @@ function createChartOfDiskUsage(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -636,7 +636,7 @@ function createChartOfDiskUsage(filePath) {
   });
 }
 
-function createChartOfDiskUtil(filePath) {
+function createChartOfDiskUtil(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -672,7 +672,7 @@ function createChartOfDiskUtil(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
