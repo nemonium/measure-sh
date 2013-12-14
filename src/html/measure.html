@@ -6,89 +6,45 @@
     <script type="text/javascript" src="measure.js"></script>
     <script type="text/javascript">
     $(function() {
+      $(".btn_cpu_all").click(function() {
+        clickAll($(this), $('.btn_cpu'));
+      });
+      $(".btn_network_all").click(function() {
+        clickAll($(this), $('.btn_network'));
+      });
+      $(".btn_diskio_all").click(function() {
+        clickAll($(this), $('.btn_diskio'));
+      });
+      $(".btn_diskutil_all").click(function() {
+        clickAll($(this), $('.btn_diskutil'));
+      });
+      $(".btn_diskuse_all").click(function() {
+        clickAll($(this), $('.btn_diskuse'));
+      });
+
       $(".btn_mem").click(function() {
-        src = $(this).attr("src");
-        targetId = $(this).attr("target");
-        if ($("#" + targetId).is(':visible')) {
-          $("#" + targetId).hide();
-        } else {
-          $("#" + targetId).show();
-          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-            createChartOfMemory(src, targetId);
-          }
-        }
+        createChart($(this), createChartOfMemory);
       });
       $(".btn_cpu").click(function() {
-        src = $(this).attr("src");
-        targetId = $(this).attr("target");
-        if ($("#" + targetId).is(':visible')) {
-          $("#" + targetId).hide();
-        } else {
-          $("#" + targetId).show();
-          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-            createChartOfCpu(src, targetId);
-          }
-        }
+        createChart($(this), createChartOfCpu);
       });
       $(".btn_loadavg").click(function() {
-        src = $(this).attr("src");
-        targetId = $(this).attr("target");
-        if ($("#" + targetId).is(':visible')) {
-          $("#" + targetId).hide();
-        } else {
-          $("#" + targetId).show();
-          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-            createChartOfLoadavg(src, targetId);
-          }
-        }
+        createChart($(this), createChartOfLoadavg);
+      });
+      $(".btn_loadavg").click(function() {
+        createChart($(this), createChartOfLoadavg);
       });
       $(".btn_network").click(function() {
-        src = $(this).attr("src");
-        targetId = $(this).attr("target");
-        if ($("#" + targetId).is(':visible')) {
-          $("#" + targetId).hide();
-        } else {
-          $("#" + targetId).show();
-          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-            createChartOfNetwork(src, targetId);
-          }
-        }
+        createChart($(this), createChartOfNetwork);
       });
       $(".btn_diskio").click(function() {
-        src = $(this).attr("src");
-        targetId = $(this).attr("target");
-        if ($("#" + targetId).is(':visible')) {
-          $("#" + targetId).hide();
-        } else {
-          $("#" + targetId).show();
-          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-            createChartOfDiskIO(src, targetId);
-          }
-        }
+        createChart($(this), createChartOfDiskIO);
       });
       $(".btn_diskutil").click(function() {
-        src = $(this).attr("src");
-        targetId = $(this).attr("target");
-        if ($("#" + targetId).is(':visible')) {
-          $("#" + targetId).hide();
-        } else {
-          $("#" + targetId).show();
-          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-            createChartOfDiskUtil(src, targetId);
-          }
-        }
+        createChart($(this), createChartOfDiskUtil);
       });
       $(".btn_diskuse").click(function() {
-        src = $(this).attr("src");
-        targetId = $(this).attr("target");
-        if ($("#" + targetId).is(':visible')) {
-          $("#" + targetId).hide();
-        } else {
-          $("#" + targetId).show();
-          if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-            createChartOfDiskUsage(src, targetId);
-          }
-        }
+        createChart($(this), createChartOfDiskUsage);
       });
     });
     </script>
@@ -97,30 +53,47 @@
   <body>
     <div>
       <span class="measure_title">Memory</span>
+      <span class="measure_all_span"></span>
       <!-- ###MEMORY### -->
     </div>
     <div>
       <span class="measure_title">Cpu</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_cpu_all" type="button" value="Open" />
+      </span>
       <!-- ###CPU### -->
     </div>
     <div>
       <span class="measure_title">LoadAverage</span>
+      <span class="measure_all_span"></span>
       <!-- ###LOAD_AVERAGE### -->
     </div>
     <div>
       <span class="measure_title">Network</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_network_all" type="button" value="Open" />
+      </span>
       <!-- ###NETWORK### -->
     </div>
     <div>
       <span class="measure_title">DiskIO</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_diskio_all" type="button" value="Open" />
+      </span>
       <!-- ###DISK_IO### -->
     </div>
     <div>
       <span class="measure_title">DiskUtil</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_diskutil_all" type="button" value="Open" />
+      </span>
       <!-- ###DISK_UTIL### -->
     </div>
     <div>
       <span class="measure_title">DiskUsage</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_diskuse_all" type="button" value="Open" />
+      </span>
       <!-- ###DISK_USAGE### -->
     </div>
     <!-- ###CONTAINER### -->

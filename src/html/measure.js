@@ -1,3 +1,43 @@
+const OPEN = 'Open'
+const CLOSE = 'Close'
+
+function isOpen(obj){
+  targetId = $(obj).attr("target");
+  return ($("#" + targetId).is(':visible'));
+}
+
+function canClick(obj, act) {
+  return ((!isOpen(obj) && act == OPEN) || (isOpen(obj) && act == CLOSE));
+}
+
+function clickAll(allBtn, btnGroup) {
+  for (var i = 0; i < btnGroup.length; i++) {
+    if (canClick(btnGroup.eq(i), allBtn.val())) {
+      btnGroup.eq(i).click();
+    }
+  }
+  if (allBtn.val() == OPEN) {
+    allBtn.val(CLOSE);
+  } else {
+    allBtn.val(OPEN);
+  }
+}
+
+function createChart(obj, func) {
+  src = obj.attr("src");
+  targetId = obj.attr("target");
+  if ($("#" + targetId).is(':visible')) {
+    obj.removeClass('btn_on');
+    $("#" + targetId).hide();
+  } else {
+    obj.addClass('btn_on');
+    $("#" + targetId).show();
+    if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+      func(src, targetId);
+    }
+  }
+}
+
 function getMeasuresFloat(measures, attr) {
   var rt = [];
   for (var i = 0; i < measures.length; i++) {
