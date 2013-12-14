@@ -6,6 +6,22 @@
     <script type="text/javascript" src="measure.js"></script>
     <script type="text/javascript">
     $(function() {
+      $(".btn_close_all").click(function() {
+        closeAll($('.btn_mem'));
+        closeAll($('.btn_cpu'));
+        closeAll($('.btn_loadavg'));
+        closeAll($('.btn_network'));
+        closeAll($('.btn_diskio'));
+        closeAll($('.btn_diskutil'));
+        closeAll($('.btn_diskuse'));
+
+        $(".btn_cpu_all").val(OPEN);
+        $(".btn_network_all").val(OPEN);
+        $(".btn_diskio_all").val(OPEN);
+        $(".btn_diskutil_all").val(OPEN);
+        $(".btn_diskuse_all").val(OPEN);
+      });
+
       $(".btn_cpu_all").click(function() {
         clickAll($(this), $('.btn_cpu'));
       });
@@ -31,9 +47,6 @@
       $(".btn_loadavg").click(function() {
         createChart($(this), createChartOfLoadavg);
       });
-      $(".btn_loadavg").click(function() {
-        createChart($(this), createChartOfLoadavg);
-      });
       $(".btn_network").click(function() {
         createChart($(this), createChartOfNetwork);
       });
@@ -51,6 +64,11 @@
     <link href="measure.css" rel="stylesheet" type="text/css">
   </head>
   <body>
+    <div>
+      <span style="width: 160px; display: inline-block;">
+        <input class="btn_all btn_close_all" type="button" value="Close all" />
+      </span>
+    </div>
     <div>
       <span class="measure_title">Memory</span>
       <span class="measure_all_span"></span>

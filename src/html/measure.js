@@ -10,6 +10,14 @@ function canClick(obj, act) {
   return ((!isOpen(obj) && act == OPEN) || (isOpen(obj) && act == CLOSE));
 }
 
+function closeAll(btnGroup) {
+  for (var i = 0; i < btnGroup.length; i++) {
+    if (canClick(btnGroup.eq(i), CLOSE)) {
+      btnGroup.eq(i).click();
+    }
+  }
+}
+
 function clickAll(allBtn, btnGroup) {
   for (var i = 0; i < btnGroup.length; i++) {
     if (canClick(btnGroup.eq(i), allBtn.val())) {
