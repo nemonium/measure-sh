@@ -1,6 +1,14 @@
 # Description
 Measure the performance of the local host.
 
+# Dependencies command
+
+- mpstat
+- iostat
+- df
+- vmstat
+- netstat
+
 # Usage
     measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
     

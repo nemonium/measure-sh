@@ -28,6 +28,27 @@ EOF
 exit 0
 }
 
+#===  FUNCTION  ================================================================
+#         NAME: which_cmd
+#  DESCRIPTION: Check for the existence of a command.
+#===============================================================================
+function which_cmd() {
+  cmd=$1
+  local rt
+  local message
+  cmd_path=$(which ${cmd} 2> /dev/null)
+  if [ $? -gt 0 ]; then
+    message="\`${cmd}\` command not found"
+    rt=1
+  fi
+  if [ ${VERBOSE:-0} -gt 0 ]; then
+    printf "  %-10s:  %s\n" "${cmd}" "${cmd_path:-${message}}"
+  else
+    test ${#message} -gt 0 && echo ${message} >&2
+  fi
+  return ${rt:-0}
+}
+
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
@@ -43,41 +64,11 @@ shift $(( $OPTIND - 1 ))
 #-------------------------------------------------------------------------------
 # Check commands
 #-------------------------------------------------------------------------------
-rt=0
-test ${VERBOSE} && echo -e " \033[0;31mC\033[0;39mommand    : \033[0;31mP\033[0;39math"
-cmd_path=$(which mpstat 2> /dev/null)
-if [ $? -gt 0 ]; then
-  echo "'mpstat' command not found"
-  rt=1
-fi
-test ${VERBOSE} && echo "  mpstat    :  ${cmd_path}"
 
-cmd_path=$(which iostat 2> /dev/null)
-if [ $? -gt 0 ]; then
-  echo "'iostat' command not found"
-  rt=1
-fi
-test ${VERBOSE} && echo "  iostat    :  ${cmd_path}"
+which_cmd mpstat;  test $? -gt 0 && rt=1
+which_cmd iostat;  test $? -gt 0 && rt=1
+which_cmd df;      test $? -gt 0 && rt=1
+which_cmd vmstat;  test $? -gt 0 && rt=1
+which_cmd netstat; test $? -gt 0 && rt=1
 
-cmd_path=$(which df 2> /dev/null)
-if [ $? -gt 0 ]; then
-  echo "'df' command not found"
-  rt=1
-fi
-test ${VERBOSE} && echo "  df        :  ${cmd_path}"
-
-cmd_path=$(which vmstat 2> /dev/null)
-if [ $? -gt 0 ]; then
-  echo "'vmstat' command not found"
-  rt=1
-fi
-test ${VERBOSE} && echo "  vmstat    :  ${cmd_path}"
-
-cmd_path=$(which netstat 2> /dev/null)
-if [ $? -gt 0 ]; then
-  echo "'netstat' command not found"
-  rt=1
-fi
-test ${VERBOSE} && echo "  netstat   :  ${cmd_path}"
-
-exit ${rt}
+exit ${rt:-0}
