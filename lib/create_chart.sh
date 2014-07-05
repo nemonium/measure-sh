@@ -53,7 +53,7 @@ function add_button() {
   sed -i -e "${c_idx}i${c_val/UUID/${target_id}}" ${RESULT_DIR}/measure.html
 }
 
-UTIL_DIR=$(cd $(dirname $0);pwd)
+VIEW_DIR=$(cd $(dirname $0);pwd)/../view
 RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
 CONTAINER_IDX=0
 
@@ -75,35 +75,36 @@ shift $(( $OPTIND - 1 ))
 
 test ! -d ${RESULT_DIR} && mkdir -p ${RESULT_DIR}
 
-cp -p ${UTIL_DIR}/html/measure.html ${RESULT_DIR}
-cp -p ${UTIL_DIR}/html/measure.js   ${RESULT_DIR}
-cp -p ${UTIL_DIR}/html/measure.css  ${RESULT_DIR}
+#cp -p ${VIEW_DIR}/html/measure.html ${RESULT_DIR}
+#cp -p ${VIEW_DIR}/html/measure.js   ${RESULT_DIR}
+#cp -p ${VIEW_DIR}/html/measure.css  ${RESULT_DIR}
+cp -pr ${VIEW_DIR}/* ${RESULT_DIR}
 
 #-------------------------------------------------------------------------------
 # Add a button for viewing memory measure results
 #-------------------------------------------------------------------------------
-add_button 'MEMORY' '<input class="btn_mem" type="button" target="UUID" src="memory.csv" value="Memory" />'
+add_button 'MEMORY' '<input class="btn_mem" type="button" target="UUID" src="data/memory.csv" value="Memory" />'
 
 #-------------------------------------------------------------------------------
 # Add a button for viewing CPU measure results
 #-------------------------------------------------------------------------------
-add_button 'CPU' '<input class="btn_cpu" type="button" target="UUID" src="cpu.all.csv" value="all" />'
+add_button 'CPU' '<input class="btn_cpu" type="button" target="UUID" src="data/cpu.all.csv" value="all" />'
 for i in ${LIST_CPU[@]}
 do
-  add_button 'CPU' `echo '<input class="btn_cpu" type="button" target="UUID" src="cpu.###.csv" value="###" />' | sed "s/###/$i/g"`
+  add_button 'CPU' `echo '<input class="btn_cpu" type="button" target="UUID" src="data/cpu.###.csv" value="###" />' | sed "s/###/$i/g"`
 done
 
 #-------------------------------------------------------------------------------
 # Add a button for viewing Load Average measure results
 #-------------------------------------------------------------------------------
-add_button 'LOAD_AVERAGE' '<input class="btn_loadavg" type="button" target="UUID" src="loadavg.csv" value="LoadAverage" />'
+add_button 'LOAD_AVERAGE' '<input class="btn_loadavg" type="button" target="UUID" src="data/loadavg.csv" value="LoadAverage" />'
 
 #-------------------------------------------------------------------------------
 # Add a button for viewing Network Traffic measure results
 #-------------------------------------------------------------------------------
 for i in ${LIST_IF[@]}
 do
-  add_button 'NETWORK' `echo '<input class="btn_network" type="button" target="UUID" src="network.###.csv" value="###" />' | sed "s/###/$i/g"`
+  add_button 'NETWORK' `echo '<input class="btn_network" type="button" target="UUID" src="data/network.###.csv" value="###" />' | sed "s/###/$i/g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -111,7 +112,7 @@ done
 #-------------------------------------------------------------------------------
 for i in ${LIST_DEV[@]}
 do
-  add_button 'DISK_IO' `echo '<input class="btn_diskio" type="button" target="UUID" src="diskio.###.csv" value="###" />' | sed "s/###/$i/g"`
+  add_button 'DISK_IO' `echo '<input class="btn_diskio" type="button" target="UUID" src="data/diskio.###.csv" value="###" />' | sed "s/###/$i/g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -119,7 +120,7 @@ done
 #-------------------------------------------------------------------------------
 for i in ${LIST_DEV[@]}
 do
-  add_button 'DISK_UTIL' `echo '<input class="btn_diskutil" type="button" target="UUID" src="diskio.###.csv" value="###" />' | sed "s/###/$i/g"`
+  add_button 'DISK_UTIL' `echo '<input class="btn_diskutil" type="button" target="UUID" src="data/diskio.###.csv" value="###" />' | sed "s/###/$i/g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -128,7 +129,7 @@ done
 for i in ${LIST_MNT[@]}
 do
   filename=`echo 'diskuse.%%%.csv' | sed "s/%%%/${i//\//\\_S_}/g"`
-  add_button 'DISK_USAGE' `echo '<input class="btn_diskuse" type="button" target="UUID" src="FILE" value="%%%" />' | \
+  add_button 'DISK_USAGE' `echo '<input class="btn_diskuse" type="button" target="UUID" src="data/FILE" value="%%%" />' | \
     sed "s/FILE/${filename}/g" | \
     sed "s/%%%/${i//\//\\/}/g"`
 done

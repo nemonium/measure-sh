@@ -36,14 +36,14 @@ EOF
 exit 0
 }
 
-UTIL_DIR=$(cd $(dirname $0);pwd)
+LIB_DIR=$(cd $(dirname $0);pwd)/lib
 RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
 INTERVAL=5
 
 #-------------------------------------------------------------------------------
 # Use commands check
 #-------------------------------------------------------------------------------
-sh ${UTIL_DIR}/check_commands.sh
+sh ${LIB_DIR}/check_commands.sh
 test $? -gt 0 && exit 1
 
 #-------------------------------------------------------------------------------
@@ -71,7 +71,12 @@ test ${INTERVAL} -lt 1  && usage
 test ${INTERVAL} -gt 60 && usage
 test "${MEASURE_TERM}" && test `expr "${MEASURE_TERM}" : '[0-9]*$'` -eq 0 && usage
 
+#-------------------------------------------------------------------------------
+# Make result directory
+#-------------------------------------------------------------------------------
 test ! -d ${RESULT_DIR} && mkdir -p ${RESULT_DIR}
+RESULT_DATA_DIR=${RESULT_DIR}/data
+test ! -d ${RESULT_DATA_DIR} && mkdir -p ${RESULT_DATA_DIR}
 
 #-------------------------------------------------------------------------------
 # Create CPU list
@@ -133,7 +138,7 @@ EOF
 #-------------------------------------------------------------------------------
 # Create Visualize Tool
 #-------------------------------------------------------------------------------
-sh ${UTIL_DIR}/create_chart.sh -o ${RESULT_DIR} \
+sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} \
   -c "${LIST_CPU[*]}" \
   -i "${LIST_IF[*]}" \
   -d "${LIST_DEV[*]}" \
@@ -169,28 +174,28 @@ do
   #-----------------------------------------------------------------------------
   # Measure the usage of memory
   #-----------------------------------------------------------------------------
-  sh ${UTIL_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DIR}/memory.csv &
+  sh ${LIB_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DATA_DIR}/memory.csv &
 
   #-----------------------------------------------------------------------------
   # Measure the usage of CPU
   #-----------------------------------------------------------------------------
-  sh ${UTIL_DIR}/measure_cpu.sh -d, -t "$time" >> ${RESULT_DIR}/cpu.all.csv &
+  sh ${LIB_DIR}/measure_cpu.sh -d, -t "$time" >> ${RESULT_DATA_DIR}/cpu.all.csv &
   for c in ${LIST_CPU[@]}
   do
-    sh ${UTIL_DIR}/measure_cpu.sh -c ${c} -d, -t "$time" >> ${RESULT_DIR}/cpu.${c}.csv &
+    sh ${LIB_DIR}/measure_cpu.sh -c ${c} -d, -t "$time" >> ${RESULT_DATA_DIR}/cpu.${c}.csv &
   done
 
   #-----------------------------------------------------------------------------
   # Load Average
   #-----------------------------------------------------------------------------
-  sh ${UTIL_DIR}/measure_loadavg.sh -d, -t "$time" >> ${RESULT_DIR}/loadavg.csv &
+  sh ${LIB_DIR}/measure_loadavg.sh -d, -t "$time" >> ${RESULT_DATA_DIR}/loadavg.csv &
 
   #-----------------------------------------------------------------------------
   # Measure the traffic of the Network
   #-----------------------------------------------------------------------------
   for i in ${LIST_IF[@]}
   do
-    sh ${UTIL_DIR}/measure_network.sh -i ${i} -d, -t "$time" >> ${RESULT_DIR}/network.${i}.csv &
+    sh ${LIB_DIR}/measure_network.sh -i ${i} -d, -t "$time" >> ${RESULT_DATA_DIR}/network.${i}.csv &
   done
 
   #-----------------------------------------------------------------------------
@@ -198,7 +203,7 @@ do
   #-----------------------------------------------------------------------------
   for i in ${LIST_DEV[@]}
   do
-    sh ${UTIL_DIR}/measure_diskio.sh -d, -t "$time" ${i} >> ${RESULT_DIR}/diskio.${i//\//_S_}.csv &
+    sh ${LIB_DIR}/measure_diskio.sh -d, -t "$time" ${i} >> ${RESULT_DATA_DIR}/diskio.${i//\//_S_}.csv &
   done
 
   #-----------------------------------------------------------------------------
@@ -206,7 +211,7 @@ do
   #-----------------------------------------------------------------------------
   for i in ${LIST_MNT[@]}
   do
-    sh ${UTIL_DIR}/measure_diskuse.sh -d, -t "$time" ${i} >> ${RESULT_DIR}/diskuse.${i//\//_S_}.csv &
+    sh ${LIB_DIR}/measure_diskuse.sh -d, -t "$time" ${i} >> ${RESULT_DATA_DIR}/diskuse.${i//\//_S_}.csv &
   done
 done
 

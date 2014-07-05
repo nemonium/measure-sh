@@ -40,3 +40,13 @@ Measure the performance of the local host.
 # Note
 1. After the script, Transfer measurement results to Local PC.
 2. Open the measure.html of results on the browser.
+
+        result-...
+        |-- data
+        |   |-- ...csv
+        |   `-- ...csv
+        |-- javascripts
+        |   `-- measure.js
+        |-- measure.html <---- here
+        `-- stylesheets
+            `-- measure.css
