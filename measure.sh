@@ -79,41 +79,45 @@ RESULT_DATA_DIR=${RESULT_DIR}/data
 test ! -d ${RESULT_DATA_DIR} && mkdir -p ${RESULT_DATA_DIR}
 
 #-------------------------------------------------------------------------------
-# Create CPU list
+# search processors
 #-------------------------------------------------------------------------------
-LIST_CPU=(`cat /proc/cpuinfo | \
-  grep ^processor | \
-  awk -v FS=: ' \
-    {
-      sub (/[ \t]+$/, "", $2);
-      sub (/^[ \t]+/, "", $2);
-      print $2
-    }
-  '`)
+LIST_CPU=$(sh ${LIB_DIR}/search_processors.sh)
+#LIST_CPU=(`cat /proc/cpuinfo | \
+#  grep ^processor | \
+#  awk -v FS=: ' \
+#    {
+#      sub (/[ \t]+$/, "", $2);
+#      sub (/^[ \t]+/, "", $2);
+#      print $2
+#    }
+#  '`)
 
 #-------------------------------------------------------------------------------
-# Create Interface list
+# search network interfaces
 #-------------------------------------------------------------------------------
-LIST_IF=(`ls /proc/sys/net/ipv4/conf/ | \
-  grep -v all | \
-  grep -v default`)
+LIST_IF=$(sh ${LIB_DIR}/search_network_ifaces.sh)
+#LIST_IF=(`ls /proc/sys/net/ipv4/conf/ | \
+#  grep -v all | \
+#  grep -v default`)
+#
+#-------------------------------------------------------------------------------
+# search devices
+#-------------------------------------------------------------------------------
+LIST_DEV=$(sh ${LIB_DIR}/search_devices.sh)
+#S_NR=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
+#E_NR=`iostat -xd  | wc -l`
+#LIST_DEV=(`iostat -xd | \
+#  awk -v FS=" " -v S=${S_NR} -v E=${E_NR} ' \
+#    NR==S,NR==E {
+#      print $1
+#    }' | \
+#  grep -v '^$'`)
 
 #-------------------------------------------------------------------------------
-# Create Device list
+# search mounted directories
 #-------------------------------------------------------------------------------
-S_NR=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
-E_NR=`iostat -xd  | wc -l`
-LIST_DEV=(`iostat -xd | \
-  awk -v FS=" " -v S=${S_NR} -v E=${E_NR} ' \
-    NR==S,NR==E {
-      print $1
-    }' | \
-  grep -v '^$'`)
-
-#-------------------------------------------------------------------------------
-# Create Mounted list
-#-------------------------------------------------------------------------------
-LIST_MNT=(`mount | awk '{print $3}'`)
+LIST_MNT=$(sh ${LIB_DIR}/search_mounted_dir.sh)
+#LIST_MNT=(`mount | awk '{print $3}'`)
 
 #-------------------------------------------------------------------------------
 # Vabose
