@@ -36,9 +36,18 @@ EOF
 exit 0
 }
 
+#===  FUNCTION  ================================================================
+#         NAME: search_data_name_list
+#  DESCRIPTION: Search data name from measure-map by measure-type
+#===============================================================================
+function search_data_name_list() {
+  grep "^${1}${MAP_DELIMITER}" ${MEASURE_MAP} | awk -v FS=${MAP_DELIMITER} '{print $3}' | tr "\n" ' '
+}
+
 LIB_DIR=$(cd $(dirname $0);pwd)/lib
 RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
 INTERVAL=5
+MAP_DELIMITER=${MAP_DELIMITER:-:}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -60,7 +69,6 @@ while getopts "o:i:t:e:hv" OPT; do
     h|:|\?) usage;;
   esac
 done
-
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
@@ -77,76 +85,37 @@ test "${MEASURE_TERM}" && test `expr "${MEASURE_TERM}" : '[0-9]*$'` -eq 0 && usa
 test ! -d ${RESULT_DIR} && mkdir -p ${RESULT_DIR}
 RESULT_DATA_DIR=${RESULT_DIR}/data
 test ! -d ${RESULT_DATA_DIR} && mkdir -p ${RESULT_DATA_DIR}
+MEASURE_MAP=${RESULT_DIR}/measure-map
 
 #-------------------------------------------------------------------------------
-# search processors
+# Make measure map
 #-------------------------------------------------------------------------------
-LIST_CPU=$(sh ${LIB_DIR}/search_processors.sh)
-#LIST_CPU=(`cat /proc/cpuinfo | \
-#  grep ^processor | \
-#  awk -v FS=: ' \
-#    {
-#      sub (/[ \t]+$/, "", $2);
-#      sub (/^[ \t]+/, "", $2);
-#      print $2
-#    }
-#  '`)
-
-#-------------------------------------------------------------------------------
-# search network interfaces
-#-------------------------------------------------------------------------------
-LIST_IF=$(sh ${LIB_DIR}/search_network_ifaces.sh)
-#LIST_IF=(`ls /proc/sys/net/ipv4/conf/ | \
-#  grep -v all | \
-#  grep -v default`)
-#
-#-------------------------------------------------------------------------------
-# search devices
-#-------------------------------------------------------------------------------
-LIST_DEV=$(sh ${LIB_DIR}/search_devices.sh)
-#S_NR=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
-#E_NR=`iostat -xd  | wc -l`
-#LIST_DEV=(`iostat -xd | \
-#  awk -v FS=" " -v S=${S_NR} -v E=${E_NR} ' \
-#    NR==S,NR==E {
-#      print $1
-#    }' | \
-#  grep -v '^$'`)
-
-#-------------------------------------------------------------------------------
-# search mounted directories
-#-------------------------------------------------------------------------------
-LIST_MNT=$(sh ${LIB_DIR}/search_mounted_dir.sh)
-#LIST_MNT=(`mount | awk '{print $3}'`)
+sh ${LIB_DIR}/make_measure_map.sh -d ${MAP_DELIMITER} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
 # Vabose
 #-------------------------------------------------------------------------------
 s_time=`date '+%s'`
 test ${VERBOSE} && cat <<EOF
-Results directory : ${RESULT_DIR}
-Measure interval  : ${INTERVAL} sec
+Results directory   : ${RESULT_DIR}
+Measure interval    : ${INTERVAL} sec
 
-Processors        : ${LIST_CPU[@]}
-Interfaces        : ${LIST_IF[@]}
-IO-devices        : ${LIST_DEV[@]}
-Mounted           : ${LIST_MNT[@]}
+Processors          : `search_data_name_list cpu`
+Interfaces          : `search_data_name_list network`
+Devices             : `search_data_name_list device`
+Mounted Directories : `search_data_name_list mount`
 
-Start time        : `date --date "@${s_time}"`
+Start time          : `date --date "@${s_time}"`
 EOF
 
 test ${VERBOSE} && test ${END_TIME} && cat << EOF
-End time          : `date --date "@${END_TIME}"`
+End time            : `date --date "@${END_TIME}"`
 EOF
 
 #-------------------------------------------------------------------------------
 # Create Visualize Tool
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} \
-  -c "${LIST_CPU[*]}" \
-  -i "${LIST_IF[*]}" \
-  -d "${LIST_DEV[*]}" \
-  -m "${LIST_MNT[*]}"
+sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} -d ${MAP_DELIMITER} ${MEASURE_MAP}
 
 while :
 do
@@ -173,49 +142,70 @@ do
   #-----------------------------------------------------------------------------
   test ${VERBOSE} && \
     now=`date --date "@${e_time}"` && \
-    echo -ne "\rElapsed time      : ${now} (${elapsed} sec)" 2>/dev/null
+    echo -ne "\rElapsed time        : ${now} (${elapsed} sec)" 2>/dev/null
 
   #-----------------------------------------------------------------------------
   # Measure the usage of memory
   #-----------------------------------------------------------------------------
-  sh ${LIB_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DATA_DIR}/memory.csv &
+  grep "^memory${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+  do
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+    sh ${LIB_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+  done
 
   #-----------------------------------------------------------------------------
   # Measure the usage of CPU
   #-----------------------------------------------------------------------------
-  sh ${LIB_DIR}/measure_cpu.sh -d, -t "$time" >> ${RESULT_DATA_DIR}/cpu.all.csv &
-  for c in ${LIST_CPU[@]}
+  grep "^cpu${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
   do
-    sh ${LIB_DIR}/measure_cpu.sh -c ${c} -d, -t "$time" >> ${RESULT_DATA_DIR}/cpu.${c}.csv &
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+    if [ "${name}" == "all" ]; then
+      sh ${LIB_DIR}/measure_cpu.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    else
+      sh ${LIB_DIR}/measure_cpu.sh -c ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    fi
   done
 
   #-----------------------------------------------------------------------------
   # Load Average
   #-----------------------------------------------------------------------------
-  sh ${LIB_DIR}/measure_loadavg.sh -d, -t "$time" >> ${RESULT_DATA_DIR}/loadavg.csv &
+  grep "^loadavg${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+  do
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+    sh ${LIB_DIR}/measure_loadavg.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+  done
 
   #-----------------------------------------------------------------------------
   # Measure the traffic of the Network
   #-----------------------------------------------------------------------------
-  for i in ${LIST_IF[@]}
+  grep "^network${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
   do
-    sh ${LIB_DIR}/measure_network.sh -i ${i} -d, -t "$time" >> ${RESULT_DATA_DIR}/network.${i}.csv &
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+    sh ${LIB_DIR}/measure_network.sh -i ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
   # Disk IO
   #-----------------------------------------------------------------------------
-  for i in ${LIST_DEV[@]}
+  grep "^device${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
   do
-    sh ${LIB_DIR}/measure_diskio.sh -d, -t "$time" ${i} >> ${RESULT_DATA_DIR}/diskio.${i//\//_S_}.csv &
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+    sh ${LIB_DIR}/measure_diskio.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
   # Disk Use
   #-----------------------------------------------------------------------------
-  for i in ${LIST_MNT[@]}
+  grep "^mount${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
   do
-    sh ${LIB_DIR}/measure_diskuse.sh -d, -t "$time" ${i} >> ${RESULT_DATA_DIR}/diskuse.${i//\//_S_}.csv &
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+    sh ${LIB_DIR}/measure_diskuse.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
   done
 done
 
