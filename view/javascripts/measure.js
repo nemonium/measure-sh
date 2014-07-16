@@ -34,6 +34,7 @@ function clickAll(allBtn, btnGroup) {
 function createChart(obj, func) {
   src = obj.attr("src");
   targetId = obj.attr("target");
+  option = obj.attr("option");
   if ($("#" + targetId).is(':visible')) {
     obj.removeClass('btn_on');
     $("#" + targetId).hide();
@@ -41,7 +42,7 @@ function createChart(obj, func) {
     obj.addClass('btn_on');
     $("#" + targetId).show();
     if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
-      func(src, targetId);
+      func(src, targetId, option);
     }
   }
 }
@@ -420,7 +421,7 @@ function createChartOfLoadavg(filePath, targetId) {
   });
 }
 
-function createChartOfNetwork(filePath, targetId) {
+function createChartOfNetwork(filePath, targetId, interval) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -451,7 +452,7 @@ function createChartOfNetwork(filePath, targetId) {
       var s = measures[i - 1][attr];
       var e = measures[i][attr];
       if (!$.isEmptyObject(s) && !$.isEmptyObject(e)) {
-        rt.push(parseFloat(e) - parseFloat(s));
+        rt.push((parseFloat(e) - parseFloat(s)) / interval);
       }
     }
     return rt;

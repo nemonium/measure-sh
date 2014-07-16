@@ -115,7 +115,7 @@ EOF
 #-------------------------------------------------------------------------------
 # Create Visualize Tool
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} -d ${MAP_DELIMITER} ${MEASURE_MAP}
+sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} -i ${INTERVAL} -d ${MAP_DELIMITER} ${MEASURE_MAP}
 
 while :
 do

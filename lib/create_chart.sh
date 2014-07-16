@@ -3,7 +3,7 @@
 #
 #         FILE: create_chart.sh
 #
-#        USAGE: create_chart.sh [-o directory] [-d delimiter] [-h] measure-map
+#        USAGE: create_chart.sh [-o directory] [-i interval] [-d delimiter] [-h] measure-map
 #
 #  DESCRIPTION: Create Visualize Tool
 #
@@ -19,11 +19,13 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-o directory] [-d delimiter] [-h] measure-map
+  ${0} [-o directory] [-i interval] [-d delimiter] [-h] measure-map
 
     -o <arg> : Specify results directory
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
                  For example, '$(cd $(dirname $0);pwd)/result-`date +%Y%m%d%H%M%S`'
+    -i <arg> : Interval to aggregate
+               Default : 5
     -d <arg> : measure-map delimiter
                Default : ':'
     -h       : Get help
@@ -65,9 +67,10 @@ CONTAINER_IDX=0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "o:d:h" OPT; do
+while getopts "o:i:d:h" OPT; do
   case ${OPT} in
     o) RESULT_DIR="${OPTARG}";;
+    i) INTERVAL="${OPTARG}";;
     d) MAP_DELIMITER="${OPTARG}";;
     h|:|\?) usage;;
   esac
@@ -75,6 +78,7 @@ done
 shift $(( $OPTIND - 1 ))
 
 MEASURE_MAP=${1}
+INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
 
 if [ ! -f ${MEASURE_MAP} ]; then
@@ -122,7 +126,7 @@ grep "^network${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
 do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-  add_button 'NETWORK' `echo '<input class="btn_network" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
+  add_button 'NETWORK' `echo '<input class="btn_network" type="button" target="UUID" src="SRC" value="VAL" option="OPT" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s#OPT#${INTERVAL}#g"`
 done
 
 #-------------------------------------------------------------------------------
