@@ -45,8 +45,11 @@ function search_data_name_list() {
 }
 
 LIB_DIR=$(cd $(dirname $0);pwd)/lib
-RESULT_DIR=./result-`date +%Y%m%d%H%M%S`
-INTERVAL=5
+
+source conf/measure.conf
+
+RESULT_DIR=${RESULT_DIR:-./result-`date +%Y%m%d%H%M%S`}
+INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
 
 #-------------------------------------------------------------------------------
