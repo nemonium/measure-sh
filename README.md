@@ -37,6 +37,19 @@ Measure the performance of the local host.
      # End time          : Tue Oct 29 23:00:00 JST 2013
      # Elapsed time      : Tue Oct 29 22:20:50 JST 2013 (5 sec)
 
+# Configuration
+
+conf/measure.conf
+
+- RESULT_DIR
+- INTERVAL
+- MAP_DELIMITER
+- MEASURE_TERM
+- END_TIME
+- VERBOSE
+
+`argument > config > export > default`
+
 # Note
 1. After the script, Transfer measurement results to Local PC.
 2. Open the measure.html of results on the browser.
