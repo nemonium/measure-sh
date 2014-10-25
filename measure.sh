@@ -44,7 +44,7 @@ function search_data_name_list() {
   grep "^${1}${MAP_DELIMITER}" ${MEASURE_MAP} | awk -v FS=${MAP_DELIMITER} '{print $3}' | tr "\n" ' '
 }
 
-LIB_DIR=$(cd $(dirname $0);pwd)/lib
+export LIB_DIR=$(cd $(dirname $0);pwd)/lib
 
 source conf/measure.conf
 
@@ -93,7 +93,7 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 #-------------------------------------------------------------------------------
 # Make measure map
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/make_measure_map.sh -d ${MAP_DELIMITER} > ${MEASURE_MAP}
+sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
 # Vabose
@@ -154,7 +154,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure_memory.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/memory.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -165,9 +165,9 @@ do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
     if [ "${name}" == "all" ]; then
-      sh ${LIB_DIR}/measure_cpu.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+      sh ${LIB_DIR}/measure/cpu.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
     else
-      sh ${LIB_DIR}/measure_cpu.sh -c ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
+      sh ${LIB_DIR}/measure/cpu.sh -c ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
     fi
   done
 
@@ -178,7 +178,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure_loadavg.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/loadavg.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure_network.sh -i ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/network.sh -i ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -198,7 +198,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure_diskio.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/diskio.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure_diskuse.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/diskuse.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
   done
 done
 

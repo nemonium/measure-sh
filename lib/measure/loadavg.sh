@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: search_processors.sh
+#         FILE: loadavg.sh
 #
-#        USAGE: search_processors.sh [-d delimiter][-h]
+#        USAGE: loadavg.sh [-d delimiter] [-t time] [-H] [-h]
 #
-#  DESCRIPTION: Search cpu processor list.
+#  DESCRIPTION: Measures the Load Average
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,10 +19,11 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter][-h]
+  ${0} [-d delimiter] [-t time] [-H] [-h]
 
-    -d <arg> : Delimiter of Result
-               Default : ' ' (space) 
+    -d <arg> : Specify delimiter
+    -t <arg> : Specify date and time to be displayed
+    -H       : Return header only
     -h       : Get help
 
 EOF
@@ -32,24 +33,31 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:h" OPT; do
+while getopts "d:t:Hh" OPT; do
   case ${OPT} in
-    d) DELIMITER="${OPTARG}";;
+    d) D="${OPTARG}";;
+    t) T="${OPTARG}";;
+    H) HEAD=1;;
     h|:|\?) usage;;
   esac
 done
+
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Search processors
+# Return the Header
 #-------------------------------------------------------------------------------
-rt=$(cat /proc/cpuinfo | grep ^processor | awk -v FS=: '
-  {
-    sub (/[ \t]+$/, "", $2);
-    sub (/^[ \t]+/, "", $2);
-    print $2
-  }')
+if [ "${HEAD}" ]; then
+  echo -e "Time${D:-\t}1min${D:-\t}5min${D:-\t}15min"
+  exit 0
+fi
 
-echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
+#-------------------------------------------------------------------------------
+# Measure
+#-------------------------------------------------------------------------------
+cat /proc/loadavg | \
+  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
+    { print TIME, $1, $2, $3 }
+  '
 
 exit 0

@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: search_mounted_dir.sh
+#         FILE: processors.sh
 #
-#        USAGE: search_mounted_dir.sh [-d delimiter][-h]
+#        USAGE: processors.sh [-d delimiter][-h]
 #
-#  DESCRIPTION: Search mounted directories.
+#  DESCRIPTION: Search cpu processor list.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -22,7 +22,7 @@ Usage:
   ${0} [-d delimiter][-h]
 
     -d <arg> : Delimiter of Result
-               Default : ' ' (space) 
+               Default : ' ' (space)
     -h       : Get help
 
 EOF
@@ -41,9 +41,14 @@ done
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Search mounted directories
+# Search processors
 #-------------------------------------------------------------------------------
-rt=$(mount | awk '{print $3}')
+rt=$(cat /proc/cpuinfo | grep ^processor | awk -v FS=: '
+  {
+    sub (/[ \t]+$/, "", $2);
+    sub (/^[ \t]+/, "", $2);
+    print $2
+  }')
 
 echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 

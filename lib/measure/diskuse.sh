@@ -1,9 +1,9 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_diskuse.sh
+#         FILE: diskuse.sh
 #
-#        USAGE: measure_diskuse.sh [-d delimiter] [-t time] [-H] [-h] mounted
+#        USAGE: diskuse.sh [-d delimiter] [-t time] [-H] [-h] mounted
 #
 #  DESCRIPTION: Measures the Disk Use
 #

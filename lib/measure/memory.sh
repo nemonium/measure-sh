@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_cpu.sh
+#         FILE: memory.sh
 #
-#        USAGE: measure_cpu.sh [-d delimiter] [-t time] [-c CPU] [-H] [-h]
+#        USAGE: memory.sh [-d delimiter] [-t time] [-H] [-h]
 #
-#  DESCRIPTION: Meaures the CPU
+#  DESCRIPTION: Measures the Memory
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,11 +19,10 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-c CPU] [-H] [-h]
+  ${0} [-d delimiter] [-t time] [-H] [-h]
 
     -d <arg> : Specify delimiter
     -t <arg> : Specify date and time to be displayed
-    -c <arg> : Specify CPU
     -H       : Return header only
     -h       : Get help
 
@@ -34,11 +33,10 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:c:Hh" OPT; do
+while getopts "d:t:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
     t) T="${OPTARG}";;
-    c) C="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -50,22 +48,37 @@ shift $(( $OPTIND - 1 ))
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  mpstat -P ALL | awk -v OFS="${D:-\t}" '
-    $3=="CPU" {
-      print "Time", $4, $5, $6, $7, $8, $9, $10, $11, $12
-    }
-  '
+  vmstat -s | \
+    awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
+      BEGIN {
+        printf "Time" D
+      }
+      NR!=COL {
+        for ( i = 2; i < NF; i++ ) {
+          printf "%s_", $i
+        }
+        printf $NF D
+      }
+      NR==COL {
+        print $2
+      }
+    '
   exit 0
 fi
 
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-mpstat -P ALL 1 1 | \
-  grep -v ^Average | \
-  awk -v CPUNO=${C:-"all"} -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
-    $3==CPUNO {
-      print TIME, $4, $5, $6, $7, $8, $9, $10, $11, $12
+vmstat -s | \
+  awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
+    BEGIN {
+      printf TIME D
+    }
+    NR!=COL {
+      printf $1 D
+    }
+    NR==COL {
+      print $1
     }
   '
 

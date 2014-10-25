@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: search_devices.sh
+#         FILE: network_ifaces.sh
 #
-#        USAGE: search_devices.sh [-d delimiter][-h]
+#        USAGE: network_ifaces.sh [-d delimiter][-h]
 #
-#  DESCRIPTION: Search device list.
+#  DESCRIPTION: Search network interfacei list.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -22,7 +22,7 @@ Usage:
   ${0} [-d delimiter][-h]
 
     -d <arg> : Delimiter of Result
-               Default : ' ' (space) 
+               Default : ' ' (space)
     -h       : Get help
 
 EOF
@@ -41,14 +41,9 @@ done
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Search devices
+# Search network interface
 #-------------------------------------------------------------------------------
-s_nr=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
-e_nr=`iostat -xd  | wc -l`
-rt=$(iostat -xd | awk -v FS=" " -v snr=${s_nr} -v enr=${e_nr} '
-  NR==snr,NR==enr{
-    print $1
-  }' | grep -v '^$')
+rt=$(ls /proc/sys/net/ipv4/conf/ | grep -v all | grep -v default)
 
 echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 

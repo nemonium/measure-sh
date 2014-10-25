@@ -1,9 +1,9 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: make_measure_map.sh
+#         FILE: measure_map.sh
 #
-#        USAGE: make_measure_map.sh [-d delimiter][-h]
+#        USAGE: measure_map.sh [-d delimiter][-h]
 #
 #  DESCRIPTION: Make measure map string
 #
@@ -22,7 +22,7 @@ Usage:
   ${0} [-d delimiter][-h]
 
     -d <arg> : Delimiter of Result
-               Default : ' ' (space) 
+               Default : ' ' (space)
     -h       : Get help
 
 EOF
@@ -43,7 +43,6 @@ shift $(( $OPTIND - 1 ))
 #-------------------------------------------------------------------------------
 # Define Constant
 #-------------------------------------------------------------------------------
-LIB_DIR=$(cd $(dirname $0);pwd)
 DELIMITER=${DELIMITER:- }
 RESULT_DATA_DIR=${RESULT_DATA_DIR:-data}
 FORMAT="%s${DELIMITER}%s${DELIMITER}%s\n"
@@ -55,21 +54,21 @@ printf "${FORMAT}" loadavg  ${RESULT_DATA_DIR}/loadavg.csv       LoadAverage
 # search processors
 #-------------------------------------------------------------------------------
 printf "${FORMAT}" cpu      ${RESULT_DATA_DIR}/cpu.all.csv       all
-for i in $( sh ${LIB_DIR}/search_processors.sh ); do
+for i in $( sh ${LIB_DIR}/search/processors.sh ); do
 printf "${FORMAT}" cpu      ${RESULT_DATA_DIR}/cpu.${i}.csv      ${i}
 done
 
 #-------------------------------------------------------------------------------
 # search network interfaces
 #-------------------------------------------------------------------------------
-for i in $( sh ${LIB_DIR}/search_network_ifaces.sh ); do
+for i in $( sh ${LIB_DIR}/search/network_ifaces.sh ); do
 printf "${FORMAT}" network  ${RESULT_DATA_DIR}/network.${i}.csv  ${i}
 done
 
 #-------------------------------------------------------------------------------
 # search devices
 #-------------------------------------------------------------------------------
-for i in $( sh ${LIB_DIR}/search_devices.sh ); do
+for i in $( sh ${LIB_DIR}/search/devices.sh ); do
 f=`echo ${i} | openssl md5 | sed 's/^.* //'`
 printf "${FORMAT}" device   ${RESULT_DATA_DIR}/device.${f}.csv   ${i}
 done
@@ -77,7 +76,7 @@ done
 #-------------------------------------------------------------------------------
 # search mounted directories
 #-------------------------------------------------------------------------------
-for i in $( sh ${LIB_DIR}/search_mounted_dir.sh ); do
+for i in $( sh ${LIB_DIR}/search/mounted_dir.sh ); do
 f=`echo ${i} | openssl md5 | sed 's/^.* //'`
 printf "${FORMAT}" mount    ${RESULT_DATA_DIR}/mount.${f}.csv    ${i}
 done

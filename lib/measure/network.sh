@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_memory.sh
+#         FILE: network.sh
 #
-#        USAGE: measure_memory.sh [-d delimiter] [-t time] [-H] [-h]
+#        USAGE: network.sh [-d delimiter] [-t time] [-i Interface] [-H] [-h]
 #
-#  DESCRIPTION: Measures the Memory
+#  DESCRIPTION: Measures the Network torrific
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,10 +19,11 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h]
+  ${0} [-d delimiter] [-t time] [-i Interface] [-H] [-h]
 
     -d <arg> : Specify delimiter
     -t <arg> : Specify date and time to be displayed
+    -i <arg> : Specify Interface
     -H       : Return header only
     -h       : Get help
 
@@ -33,10 +34,11 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:t:i:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
     t) T="${OPTARG}";;
+    i) I="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -48,20 +50,10 @@ shift $(( $OPTIND - 1 ))
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  vmstat -s | \
-    awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
-      BEGIN {
-        printf "Time" D
-      }
-      NR!=COL {
-        for ( i = 2; i < NF; i++ ) {
-          printf "%s_", $i
-        }
-        printf $NF D
-      }
-      NR==COL {
-        print $2
-      }
+  netstat -I"${I:-lo}" | \
+    grep ^Iface | \
+    awk -v OFS="${D:-\t}" '
+      { print "Time", $4, $5, $6, $7, $8, $9, $10, $11 }
     '
   exit 0
 fi
@@ -69,17 +61,10 @@ fi
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-vmstat -s | \
-  awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
-    BEGIN {
-      printf TIME D
-    }
-    NR!=COL {
-      printf $1 D 
-    }
-    NR==COL {
-      print $1
-    }
+netstat -I"${I:-lo}" | \
+  grep "^${I:-lo}" | \
+  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
+    { print TIME, $4, $5, $6, $7, $8, $9, $10, $11 }
   '
 
 exit 0

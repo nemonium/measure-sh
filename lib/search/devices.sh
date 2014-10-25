@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_loadavg.sh
+#         FILE: devices.sh
 #
-#        USAGE: measure_loadavg.sh [-d delimiter] [-t time] [-H] [-h]
+#        USAGE: devices.sh [-d delimiter][-h]
 #
-#  DESCRIPTION: Measures the Load Average
+#  DESCRIPTION: Search device list.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,11 +19,10 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h]
+  ${0} [-d delimiter][-h]
 
-    -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
-    -H       : Return header only
+    -d <arg> : Delimiter of Result
+               Default : ' ' (space)
     -h       : Get help
 
 EOF
@@ -33,31 +32,24 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:h" OPT; do
   case ${OPT} in
-    d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
-    H) HEAD=1;;
+    d) DELIMITER="${OPTARG}";;
     h|:|\?) usage;;
   esac
 done
-
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Return the Header
+# Search devices
 #-------------------------------------------------------------------------------
-if [ "${HEAD}" ]; then
-  echo -e "Time${D:-\t}1min${D:-\t}5min${D:-\t}15min"
-  exit 0
-fi
+s_nr=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
+e_nr=`iostat -xd  | wc -l`
+rt=$(iostat -xd | awk -v FS=" " -v snr=${s_nr} -v enr=${e_nr} '
+  NR==snr,NR==enr{
+    print $1
+  }' | grep -v '^$')
 
-#-------------------------------------------------------------------------------
-# Measure
-#-------------------------------------------------------------------------------
-cat /proc/loadavg | \
-  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
-    { print TIME, $1, $2, $3 }
-  '
+echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 
 exit 0
