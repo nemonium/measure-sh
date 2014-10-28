@@ -3,7 +3,7 @@
 #
 #         FILE: measure_map.sh
 #
-#        USAGE: measure_map.sh [-d delimiter][-h]
+#        USAGE: measure_map.sh [-l path][-d delimiter][-h]
 #
 #  DESCRIPTION: Make measure map string
 #
@@ -19,8 +19,9 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter][-h]
+  ${0} [-l path][-d delimiter][-h]
 
+    -l <arg> : line_count ini file path
     -d <arg> : Delimiter of Result
                Default : ' ' (space)
     -h       : Get help
@@ -32,8 +33,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:h" OPT; do
+while getopts "l:d:h" OPT; do
   case ${OPT} in
+    l) LINE_COUNT_INI="${OPTARG}";;
     d) DELIMITER="${OPTARG}";;
     h|:|\?) usage;;
   esac
@@ -80,5 +82,16 @@ for i in $( sh ${LIB_DIR}/search/mounted_dir.sh ); do
 f=`echo ${i} | openssl md5 | sed 's/^.* //'`
 printf "${FORMAT}" mount    ${RESULT_DATA_DIR}/mount.${f}.csv    ${i}
 done
+
+#-------------------------------------------------------------------------------
+# search line count groups
+#-------------------------------------------------------------------------------
+if [ -f "${LINE_COUNT_INI}" ]; then
+  for i in $( egrep "^\[.+\]$" ${LINE_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
+    test "`sh ${LIB_DIR}/make/line_count_condition.sh ${LINE_COUNT_INI} ${i}`" == "" && continue
+    printf "${FORMAT}" line_count ${RESULT_DATA_DIR}/line_count.${i}.csv \
+      "${i}:`sh ${LIB_DIR}/make/line_count_condition.sh ${LINE_COUNT_INI} ${i}`"
+  done
+fi
 
 exit 0

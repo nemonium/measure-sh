@@ -39,7 +39,7 @@ Measure the performance of the local host.
 
 # Configuration
 
-conf/measure.conf
+### conf/measure.conf
 
 - RESULT_DIR
 - INTERVAL
@@ -49,6 +49,17 @@ conf/measure.conf
 - VERBOSE
 
 `argument > config > export > default`
+
+### conf/measure_line_count.ini
+
+- ex) If you want to aggregate the results of dsn of maillog.
+
+        [dsn]
+        file=/var/log/maillog
+        condition=client=
+        condition=dsn=2
+        condition=dsn=4
+        condition=dsn=5
 
 # Note
 1. After the script, Transfer measurement results to Local PC.

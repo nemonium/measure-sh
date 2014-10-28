@@ -151,4 +151,15 @@ do
   add_button 'DISK_USAGE' `echo '<input class="btn_diskuse" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
 done
 
+#-------------------------------------------------------------------------------
+# Add a button for viewing Line count results
+#-------------------------------------------------------------------------------
+grep "^line_count${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+do
+  path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+  name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
+  conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f4- | sed 's/\"/\"\"/g'`"
+  add_button 'LINE_COUNT' `echo '<input class="btn_line_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+done
+
 exit 0

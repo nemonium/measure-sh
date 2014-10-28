@@ -15,12 +15,14 @@
         closeAll($('.btn_diskio'));
         closeAll($('.btn_diskutil'));
         closeAll($('.btn_diskuse'));
+        closeAll($('.btn_line_count'));
 
         $(".btn_cpu_all").val(OPEN);
         $(".btn_network_all").val(OPEN);
         $(".btn_diskio_all").val(OPEN);
         $(".btn_diskutil_all").val(OPEN);
         $(".btn_diskuse_all").val(OPEN);
+        $(".btn_line_count_all").val(OPEN);
       });
 
       $(".btn_cpu_all").click(function() {
@@ -37,6 +39,9 @@
       });
       $(".btn_diskuse_all").click(function() {
         clickAll($(this), $('.btn_diskuse'));
+      });
+      $(".btn_line_count_all").click(function() {
+        clickAll($(this), $('.btn_line_count'));
       });
 
       $(".btn_mem").click(function() {
@@ -59,6 +64,9 @@
       });
       $(".btn_diskuse").click(function() {
         createChart($(this), createChartOfDiskUsage);
+      });
+      $(".btn_line_count").click(function() {
+        createChart($(this), createChartOfLineCount);
       });
     });
     </script>
@@ -114,6 +122,13 @@
         <input class="btn_all btn_diskuse_all" type="button" value="Open" />
       </span>
       <!-- ###DISK_USAGE### -->
+    </div>
+    <div>
+      <span class="measure_title">Line Count</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_line_count_all" type="button" value="Open" />
+      </span>
+      <!-- ###LINE_COUNT### -->
     </div>
     <!-- ###CONTAINER### -->
   </body>

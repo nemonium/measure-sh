@@ -19,7 +19,7 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
+  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path]
 
     -o <arg> : Specify results directory
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
@@ -29,6 +29,8 @@ Usage:
     -t <arg> : Specify measure term
     -e <arg> : End time.
                See the d option of the date command for format.
+    -l <arg> : line_count ini file path
+               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_line_count.ini'
     -v       : Verbose
     -h       : Get help
 
@@ -44,13 +46,16 @@ function search_data_name_list() {
   grep "^${1}${MAP_DELIMITER}" ${MEASURE_MAP} | awk -v FS=${MAP_DELIMITER} '{print $3}' | tr "\n" ' '
 }
 
-export LIB_DIR=$(cd $(dirname $0);pwd)/lib
+export MEASURE_HOME=$(cd $(dirname $0);pwd)
+export LIB_DIR=${MEASURE_HOME}/lib
+export CONF_DIR=${MEASURE_HOME}/conf
 
-source conf/measure.conf
+source ${CONF_DIR}/measure.conf
 
 RESULT_DIR=${RESULT_DIR:-./result-`date +%Y%m%d%H%M%S`}
 INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
+LINE_COUNT_INI=${LINE_COUNT_INI:-${CONF_DIR}/measure_line_count.ini}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -61,8 +66,9 @@ test $? -gt 0 && exit 1
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "o:i:t:e:hv" OPT; do
+while getopts "l:o:i:t:e:hv" OPT; do
   case ${OPT} in
+    l) LINE_COUNT_INI="${OPTARG}";;
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
@@ -93,7 +99,7 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 #-------------------------------------------------------------------------------
 # Make measure map
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} > ${MEASURE_MAP}
+sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} -l ${LINE_COUNT_INI} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
 # Vabose
@@ -123,7 +129,7 @@ sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} -i ${INTERVAL} -d ${MAP_DELIMITER
 while :
 do
   sleep ${INTERVAL}
-  time=`date "+%Y-%m-%d %H:%M:%S"`
+  time=`date '+%Y-%m-%d %H:%M:%S'`
 
   e_time=`date '+%s'`
   elapsed=$((${e_time} - ${s_time}))
@@ -209,6 +215,16 @@ do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
     sh ${LIB_DIR}/measure/diskuse.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
+  done
+
+  #-----------------------------------------------------------------------------
+  # Count the specific line in the file
+  #-----------------------------------------------------------------------------
+  grep "^line_count${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+  do
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    condition="`echo ${line} | cut -d ${MAP_DELIMITER} -f4-`"
+    sh ${LIB_DIR}/measure/line_count.sh -d, -t "$time" ${condition} >> ${RESULT_DIR}/${path} &
   done
 done
 
