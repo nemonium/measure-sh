@@ -3,7 +3,7 @@
 #
 #         FILE: line_count.sh
 #
-#        USAGE: line_count.sh [-d delimiter] [-D delay] [-t time] [-T directory] [-H] [-h] condition
+#        USAGE: line_count.sh [-d delimiter] [-D delay] [-T directory] [-H] [-h] condition
 #
 #  DESCRIPTION: count the number of rows that were in condition
 #
@@ -19,13 +19,12 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-D delay] [-t time] [-T directory] [-H] [-h] condition
+  ${0} [-d delimiter] [-D delay] [-T directory] [-H] [-h] condition
 
     -d <arg>  : Result delimiter
                 default : \\t
     -D <arg>  : Interval to aggregate
                 default : 5 sec
-    -t <arg>  : Specify date and time to be displayed
     -T <arg>  : Temporary directory
                 default : /var/tmp
     -H        : Return header only
@@ -40,11 +39,10 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:D:t:T:Hh" OPT; do
+while getopts "d:D:T:Hh" OPT; do
   case ${OPT} in
     d) DELIMITER="${OPTARG}";;
     D) DELAY="${OPTARG}";;
-    t) T="${OPTARG}";;
     T) TMP_DIR="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
@@ -81,7 +79,7 @@ sleep ${DELAY} &
 pid=$!
 tail -n 0 --pid=${pid} -F ${filename} > ${TMP_FILE}
 
-echo -ne "${T:-`date +%H:%M:%S`}${DELIMITER:-\t}"
+echo -ne "${now_time:-`date +%H:%M:%S`}${DELIMITER:-\t}"
 echo "${@}" | cut -d: -f2- | tr -s '#' '\n' | while read keyword
 do
   total=`grep "${keyword}" ${TMP_FILE} | wc -l`

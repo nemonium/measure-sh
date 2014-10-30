@@ -3,7 +3,7 @@
 #
 #         FILE: loadavg.sh
 #
-#        USAGE: loadavg.sh [-d delimiter] [-t time] [-H] [-h]
+#        USAGE: loadavg.sh [-d delimiter] [-H] [-h]
 #
 #  DESCRIPTION: Measures the Load Average
 #
@@ -19,10 +19,9 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h]
+  ${0} [-d delimiter] [-H] [-h]
 
     -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
     -H       : Return header only
     -h       : Get help
 
@@ -33,10 +32,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -56,7 +54,7 @@ fi
 # Measure
 #-------------------------------------------------------------------------------
 cat /proc/loadavg | \
-  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
+  awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
     { print TIME, $1, $2, $3 }
   '
 

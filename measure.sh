@@ -129,7 +129,7 @@ sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} -i ${INTERVAL} -d ${MAP_DELIMITER
 while :
 do
   sleep ${INTERVAL}
-  time=`date '+%Y-%m-%d %H:%M:%S'`
+  export now_time="`date '+%Y-%m-%d %H:%M:%S'`"
 
   e_time=`date '+%s'`
   elapsed=$((${e_time} - ${s_time}))
@@ -160,7 +160,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/memory.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/memory.sh -d, >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -171,9 +171,9 @@ do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
     if [ "${name}" == "all" ]; then
-      sh ${LIB_DIR}/measure/cpu.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+      sh ${LIB_DIR}/measure/cpu.sh -d, >> ${RESULT_DIR}/${path} &
     else
-      sh ${LIB_DIR}/measure/cpu.sh -c ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
+      sh ${LIB_DIR}/measure/cpu.sh -c ${name} -d, >> ${RESULT_DIR}/${path} &
     fi
   done
 
@@ -184,7 +184,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/loadavg.sh -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/loadavg.sh -d, >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -194,7 +194,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/network.sh -i ${name} -d, -t "$time" >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/network.sh -i ${name} -d, >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -204,7 +204,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/diskio.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/diskio.sh -d, ${name} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/diskuse.sh -d, -t "$time" ${name} >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/diskuse.sh -d, ${name} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -224,7 +224,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     condition="`echo ${line} | cut -d ${MAP_DELIMITER} -f4-`"
-    sh ${LIB_DIR}/measure/line_count.sh -d, -t "$time" ${condition} >> ${RESULT_DIR}/${path} &
+    sh ${LIB_DIR}/measure/line_count.sh -d, ${condition} >> ${RESULT_DIR}/${path} &
   done
 done
 

@@ -3,7 +3,7 @@
 #
 #         FILE: memory.sh
 #
-#        USAGE: memory.sh [-d delimiter] [-t time] [-H] [-h]
+#        USAGE: memory.sh [-d delimiter] [-H] [-h]
 #
 #  DESCRIPTION: Measures the Memory
 #
@@ -19,10 +19,9 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h]
+  ${0} [-d delimiter] [-H] [-h]
 
     -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
     -H       : Return header only
     -h       : Get help
 
@@ -33,10 +32,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -70,7 +68,7 @@ fi
 # Measure
 #-------------------------------------------------------------------------------
 vmstat -s | \
-  awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
+  awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${now_time:-`date +%H:%M:%S`}" '
     BEGIN {
       printf TIME D
     }

@@ -3,7 +3,7 @@
 #
 #         FILE: diskuse.sh
 #
-#        USAGE: diskuse.sh [-d delimiter] [-t time] [-H] [-h] mounted
+#        USAGE: diskuse.sh [-d delimiter] [-H] [-h] mounted
 #
 #  DESCRIPTION: Measures the Disk Use
 #
@@ -19,14 +19,13 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h] mounted
+  ${0} [-d delimiter] [-H] [-h] mounted
 
     -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
     -H       : Return header only
     -h       : Get help
-
     mounted  : Specify Device
+
 EOF
 exit 0
 }
@@ -34,10 +33,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -65,7 +63,7 @@ test ${#MNT} -eq 0 && usage
 ret=(`df ${MNT} | awk 'NR>=2 {print}'`)
 test ${#ret} -eq 0 && exit 0
 echo ${ret[@]} | \
-  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
+  awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
     { print TIME, $2, $3, $4, $5 }
   '
 

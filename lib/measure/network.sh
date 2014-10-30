@@ -3,7 +3,7 @@
 #
 #         FILE: network.sh
 #
-#        USAGE: network.sh [-d delimiter] [-t time] [-i Interface] [-H] [-h]
+#        USAGE: network.sh [-d delimiter] [-i Interface] [-H] [-h]
 #
 #  DESCRIPTION: Measures the Network torrific
 #
@@ -19,10 +19,9 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-i Interface] [-H] [-h]
+  ${0} [-d delimiter] [-i Interface] [-H] [-h]
 
     -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
     -i <arg> : Specify Interface
     -H       : Return header only
     -h       : Get help
@@ -34,10 +33,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:i:Hh" OPT; do
+while getopts "d:i:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
     i) I="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
@@ -63,7 +61,7 @@ fi
 #-------------------------------------------------------------------------------
 netstat -I"${I:-lo}" | \
   grep "^${I:-lo}" | \
-  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
+  awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
     { print TIME, $4, $5, $6, $7, $8, $9, $10, $11 }
   '
 
