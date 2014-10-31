@@ -55,7 +55,7 @@ source ${CONF_DIR}/measure.conf
 RESULT_DIR=${RESULT_DIR:-./result-`date +%Y%m%d%H%M%S`}
 INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
-LINE_COUNT_INI=${LINE_COUNT_INI:-${CONF_DIR}/measure_line_count.ini}
+MEASURE_LINE_COUNT_INI=${MEASURE_LINE_COUNT_INI:-${CONF_DIR}/measure_line_count.ini}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -68,7 +68,7 @@ test $? -gt 0 && exit 1
 #-------------------------------------------------------------------------------
 while getopts "l:o:i:t:e:hv" OPT; do
   case ${OPT} in
-    l) LINE_COUNT_INI="${OPTARG}";;
+    l) MEASURE_LINE_COUNT_INI="${OPTARG}";;
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
@@ -99,7 +99,7 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 #-------------------------------------------------------------------------------
 # Make measure map
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} -l ${LINE_COUNT_INI} > ${MEASURE_MAP}
+sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} -l ${MEASURE_LINE_COUNT_INI} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
 # Vabose
