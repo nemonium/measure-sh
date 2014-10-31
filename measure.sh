@@ -128,7 +128,8 @@ sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} -i ${INTERVAL} -d ${MAP_DELIMITER
 
 while :
 do
-  sleep ${INTERVAL}
+  sleep ${INTERVAL} &
+  sleep_pid=$!
   export now_time="`date '+%Y-%m-%d %H:%M:%S'`"
 
   e_time=`date '+%s'`
@@ -226,6 +227,8 @@ do
     condition="`echo ${line} | cut -d ${MAP_DELIMITER} -f4-`"
     sh ${LIB_DIR}/measure/line_count.sh -d, ${condition} >> ${RESULT_DIR}/${path} &
   done
+
+  wait ${sleep_pid}
 done
 
 exit 0
