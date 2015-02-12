@@ -31,7 +31,7 @@ Usage:
     -h       : Get help
     measure-map
              : Format
-               <measure-type>:<file-path>:<name>
+               <measure-type>:<file-path>:<name>[:<option>]
 
                  measure-type : Measurement type
                  file-path    : Relative path from the results
@@ -160,6 +160,17 @@ do
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
   conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f4- | sed 's/\"/\"\"/g'`"
   add_button 'LINE_COUNT' `echo '<input class="btn_line_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+done
+
+#-------------------------------------------------------------------------------
+# Add a button for viewing Process count results
+#-------------------------------------------------------------------------------
+grep "^ps_count${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+do
+  path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+  name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
+  conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f4- | sed 's/\"/\"\"/g'`"
+  add_button 'PS_COUNT' `echo '<input class="btn_ps_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
 done
 
 exit 0

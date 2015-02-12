@@ -7,6 +7,17 @@
 #
 #  DESCRIPTION: Make measure_line_count.sh's condition
 #
+#               Output format : file:condition[#condition...]
+#
+#                 ex)
+#                   Input  [dsn]
+#                          file=/var/log/maillog
+#                          condition=client=
+#                          condition=dsn=2
+#                          condition=dsn=4
+#                          condition=dsn=5
+#                   Output /var/log/maillog:client=#dsn=2#dsn=4#dsn=5
+#
 #      OPTIONS: see function ’usage’ below
 #
 #===================================================================================

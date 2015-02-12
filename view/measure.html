@@ -16,6 +16,7 @@
         closeAll($('.btn_diskutil'));
         closeAll($('.btn_diskuse'));
         closeAll($('.btn_line_count'));
+        closeAll($('.btn_ps_count'));
 
         $(".btn_cpu_all").val(OPEN);
         $(".btn_network_all").val(OPEN);
@@ -23,6 +24,7 @@
         $(".btn_diskutil_all").val(OPEN);
         $(".btn_diskuse_all").val(OPEN);
         $(".btn_line_count_all").val(OPEN);
+        $(".btn_ps_count_all").val(OPEN);
       });
 
       $(".btn_cpu_all").click(function() {
@@ -42,6 +44,9 @@
       });
       $(".btn_line_count_all").click(function() {
         clickAll($(this), $('.btn_line_count'));
+      });
+      $(".btn_ps_count_all").click(function() {
+        clickAll($(this), $('.btn_ps_count'));
       });
 
       $(".btn_mem").click(function() {
@@ -67,6 +72,9 @@
       });
       $(".btn_line_count").click(function() {
         createChart($(this), createChartOfLineCount);
+      });
+      $(".btn_ps_count").click(function() {
+        createChart($(this), createChartOfPsCount);
       });
     });
     </script>
@@ -129,6 +137,13 @@
         <input class="btn_all btn_line_count_all" type="button" value="Open" />
       </span>
       <!-- ###LINE_COUNT### -->
+    </div>
+    <div>
+      <span class="measure_title">Ps Count</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_ps_count_all" type="button" value="Open" />
+      </span>
+      <!-- ###PS_COUNT### -->
     </div>
     <!-- ###CONTAINER### -->
   </body>

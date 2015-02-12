@@ -19,7 +19,7 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path]
+  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path] [-p path]
 
     -o <arg> : Specify results directory
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
@@ -31,6 +31,8 @@ Usage:
                See the d option of the date command for format.
     -l <arg> : line_count ini file path
                Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_line_count.ini'
+    -p <arg> : ps_count ini file path
+               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_ps_count.ini'
     -v       : Verbose
     -h       : Get help
 
@@ -56,6 +58,7 @@ RESULT_DIR=${RESULT_DIR:-./result-`date +%Y%m%d%H%M%S`}
 INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
 MEASURE_LINE_COUNT_INI=${MEASURE_LINE_COUNT_INI:-${CONF_DIR}/measure_line_count.ini}
+MEASURE_PS_COUNT_INI=${MEASURE_PS_COUNT_INI:-${CONF_DIR}/measure_ps_count.ini}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -66,9 +69,10 @@ test $? -gt 0 && exit 1
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "l:o:i:t:e:hv" OPT; do
+while getopts "p:l:o:i:t:e:hv" OPT; do
   case ${OPT} in
     l) MEASURE_LINE_COUNT_INI="${OPTARG}";;
+    p) MEASURE_PS_COUNT_INI="${OPTARG}";;
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
@@ -99,7 +103,9 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 #-------------------------------------------------------------------------------
 # Make measure map
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} -l ${MEASURE_LINE_COUNT_INI} > ${MEASURE_MAP}
+sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} \
+  -l ${MEASURE_LINE_COUNT_INI} \
+  -p ${MEASURE_PS_COUNT_INI} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
 # Vabose
@@ -226,6 +232,19 @@ do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     condition="`echo ${line} | cut -d ${MAP_DELIMITER} -f4-`"
     sh ${LIB_DIR}/measure/line_count.sh -d, ${condition} >> ${RESULT_DIR}/${path} &
+  done
+
+  #-----------------------------------------------------------------------------
+  # Process count
+  #-----------------------------------------------------------------------------
+  grep "^ps_count${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+  do
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    conditions=( `echo ${line} | cut -d ${MAP_DELIMITER} -f4- | tr -s '#' ' '` )
+    for c in ${conditions[@]}; do
+      condition_str="${condition_str} -c ${c}"
+    done
+    sh ${LIB_DIR}/measure/ps_count.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
   done
 
   wait ${sleep_pid}

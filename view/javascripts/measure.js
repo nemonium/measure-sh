@@ -856,3 +856,87 @@ function createChartOfLineCount(filePath, targetId, opt) {
     });
   });
 }
+
+function createChartOfPsCount(filePath, targetId, opt) {
+
+  var conditions = opt.split("#");
+
+  function getArrayMeasures(data) {
+    var rt = [];
+    $.each(data.split('\n'), function() {
+      var m = this.split(',');
+      var o = new Object();
+      o["time"] = m[0];
+      $.each(conditions, function(index, elem) {
+        o[elem] = m[index + 1];
+      });
+      rt.push(o);
+    });
+    return rt;
+  }
+
+  var times;
+  var values = new Object;
+  var optionArray = [];
+  optionArray.push({opt: {url: filePath},
+    func: function(data){
+      var measures = getArrayMeasures(data);
+      times = getMeasuresStr(measures, 'time');
+      $.each(conditions, function(index, elem) {
+        values[elem] = getMeasuresFloat(measures, elem);
+      });
+  }});
+
+  doOrderGuaranteedAjax(optionArray, function(data){
+
+    var series = new Array();
+    $.each(conditions, function(index, elem) {
+      series.push({ name: elem, marker: { symbol: 'diamond' }, data: values[elem] })
+    });
+
+    $("#" + targetId).highcharts({
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: 'Process Count'
+      },
+      subtitle: {
+        text: filePath
+      },
+      xAxis: {
+        title: {
+          text: 'Time'
+        },
+        categories: times,
+        tickInterval: parseInt(times.length / 10)
+      },
+      yAxis: {
+        title: {
+          text: 'Count'
+        },
+        labels: {
+          formatter: function() {
+            return this.value
+          }
+        },
+        min: 0
+      },
+      tooltip: {
+        crosshairs: true,
+        shared: true
+      },
+      plotOptions: {
+        spline: {
+          marker: {
+            enabled: false,
+            radius: 4,
+            lineColor: '#666666',
+            lineWidth: 1
+          }
+        }
+      },
+      series: series
+    });
+  });
+}
