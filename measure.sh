@@ -19,7 +19,7 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path] [-p path]
+  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path] [-p path] [-a path]
 
     -o <arg> : Specify results directory
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
@@ -33,6 +33,8 @@ Usage:
                Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_line_count.ini'
     -p <arg> : ps_count ini file path
                Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_ps_count.ini'
+    -a <arg> : ps_aggregate ini file path
+               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_ps_aggregate.ini'
     -v       : Verbose
     -h       : Get help
 
@@ -59,6 +61,7 @@ INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
 MEASURE_LINE_COUNT_INI=${MEASURE_LINE_COUNT_INI:-${CONF_DIR}/measure_line_count.ini}
 MEASURE_PS_COUNT_INI=${MEASURE_PS_COUNT_INI:-${CONF_DIR}/measure_ps_count.ini}
+MEASURE_PS_AGGREGATE_INI=${MEASURE_PS_AGGREGATE_INI:-${CONF_DIR}/measure_ps_aggregate.ini}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -69,10 +72,11 @@ test $? -gt 0 && exit 1
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "p:l:o:i:t:e:hv" OPT; do
+while getopts "a:p:l:o:i:t:e:hv" OPT; do
   case ${OPT} in
     l) MEASURE_LINE_COUNT_INI="${OPTARG}";;
     p) MEASURE_PS_COUNT_INI="${OPTARG}";;
+    a) MEASURE_PS_AGGREGATE_INI="${OPTARG}";;
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
@@ -105,6 +109,7 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 #-------------------------------------------------------------------------------
 sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} \
   -l ${MEASURE_LINE_COUNT_INI} \
+  -a ${MEASURE_PS_AGGREGATE_INI} \
   -p ${MEASURE_PS_COUNT_INI} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
@@ -245,6 +250,23 @@ do
       condition_str="${condition_str} -c ${c}"
     done
     sh ${LIB_DIR}/measure/ps_count.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
+  done
+
+  #-----------------------------------------------------------------------------
+  # Process aggregate
+  # ps_aggregate:data/ps_aggregate.mem.csv:mem:pmem,%.1f:comm,httpd#comm,bash
+  #-----------------------------------------------------------------------------
+  grep "^ps_aggregate${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+  do
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    aggregate=( `echo ${line} | cut -d ${MAP_DELIMITER} -f4` )
+    conditions=( `echo ${line} | cut -d ${MAP_DELIMITER} -f5- | tr -s '#' ' '` )
+    condition_str="-a ${aggregate%%,*}"
+    test "${aggregate#*,}" != "" && condition_str="${condition_str} -f ${aggregate#*,}"
+    for c in ${conditions[@]}; do
+      condition_str="${condition_str} -c ${c}"
+    done
+    sh ${LIB_DIR}/measure/ps_aggregate.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
   done
 
   wait ${sleep_pid}

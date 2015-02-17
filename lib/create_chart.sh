@@ -173,4 +173,15 @@ do
   add_button 'PS_COUNT' `echo '<input class="btn_ps_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
 done
 
+#-------------------------------------------------------------------------------
+# Add a button for viewing Process aggregate results
+#-------------------------------------------------------------------------------
+grep "^ps_aggregate${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+do
+  path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+  name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
+  conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f5- | sed 's/\"/\"\"/g'`"
+  add_button 'PS_AGGREGATE' `echo '<input class="btn_ps_aggregate" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+done
+
 exit 0

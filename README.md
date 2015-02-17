@@ -23,6 +23,8 @@ Measure the performance of the local host.
                    Default : '$(cd $(dirname $0);pwd)/conf/measure_line_count.ini'
         -p <arg> : ps_count ini file path
                    Default : '$(cd $(dirname $0);pwd)/conf/measure_ps_count.ini'
+        -a <arg> : ps_aggregate ini file path
+                   Default : '$(cd $(dirname $0);pwd)/conf/measure_ps_aggregate.ini'
         -v       : Verbose
         -h       : Get help
 
@@ -72,6 +74,15 @@ Measure the performance of the local host.
         [process]
         condition=comm:sendmail
 
+### conf/measure_ps_aggregate.ini
+
+- ex) If you aggregate memory of process.
+
+        [mem]
+        aggregate=pmem:%.1f
+        condition=comm:httpd
+        condition=comm:bash
+
 ## Note
 1. After the script, Transfer measurement results to Local PC.
 2. Open the measure.html of results on the browser.
@@ -83,5 +94,6 @@ Measure the performance of the local host.
         |-- javascripts
         |   `-- measure.js
         |-- measure.html <---- here
+        |-- measure-map
         `-- stylesheets
             `-- measure.css

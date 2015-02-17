@@ -3,7 +3,7 @@
 #
 #         FILE: measure_map.sh
 #
-#        USAGE: measure_map.sh [-l path][-d delimiter][-h]
+#        USAGE: measure_map.sh [-a paht][-p path][-l path][-d delimiter][-h]
 #
 #  DESCRIPTION: Make measure map string
 #
@@ -19,8 +19,9 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-p path][-l path][-d delimiter][-h]
+  ${0} [-a paht][-p path][-l path][-d delimiter][-h]
 
+    -a <arg> : ps_aggregate ini file path
     -p <arg> : ps_count ini file path
     -l <arg> : line_count ini file path
     -d <arg> : Delimiter of Result
@@ -34,8 +35,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "p:l:d:h" OPT; do
+while getopts "a:p:l:d:h" OPT; do
   case ${OPT} in
+    a) PS_AGGREGATE_INI="${OPTARG}";;
     p) PS_COUNT_INI="${OPTARG}";;
     l) LINE_COUNT_INI="${OPTARG}";;
     d) DELIMITER="${OPTARG}";;
@@ -121,7 +123,7 @@ fi
 #-------------------------------------------------------------------------------
 # search ps count groups
 #   Format : ps_count:<data_path>:<name>:<condition>[#[condition>...]
-#            condition := <user-define>,<pattern>
+#            condition := <user-defined>,<pattern>
 #
 #   ex) Input  [ps]
 #              condition=comm:sendmail
@@ -130,12 +132,41 @@ fi
 #-------------------------------------------------------------------------------
 if [ -f "${PS_COUNT_INI}" ]; then
   for i in $( egrep "^\[.+\]$" ${PS_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
-    for c in $(sh ${LIB_DIR}/utils/read_ini.sh conf/measure_ps_count.ini ${i} condition); do
+    for c in $(sh ${LIB_DIR}/utils/read_ini.sh ${PS_COUNT_INI} ${i} condition); do
       conditions=("${conditions[@]}" "${c/:/,}")
     done
     test ${#conditions[@]} -lt 1 && continue
     printf "${FORMAT}" ps_count ${RESULT_DATA_DIR}/ps_count.${i}.csv \
       "${i}:$(IFS=#; echo "${conditions[*]}")"
+  done
+fi
+
+#-------------------------------------------------------------------------------
+# search ps aggregate groups
+#   Format : ps_aggregate:<data_path>:<name>:<aggregate>:<condition>[#[condition>...]
+#            aggregate := <user-defined>[,<format>]
+#            condition := <user-defined>,<pattern>
+#
+#   ex) Input  [mem]
+#              aggregate=pmem:%.1f
+#              condition=comm:httpd
+#              condition=comm:bash
+#       Output ps_aggregate:data/ps_aggregate.mem.csv:mem:pmem,%.1f:comm,httpd#comm,bash
+#-------------------------------------------------------------------------------
+if [ -f "${PS_AGGREGATE_INI}" ]; then
+  for i in $( egrep "^\[.+\]$" ${PS_AGGREGATE_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
+    unset aggregate
+    unset conditions
+    for a in $(sh ${LIB_DIR}/utils/read_ini.sh ${PS_AGGREGATE_INI} ${i} aggregate); do
+      aggregate="${a/:/,}"
+    done
+    for c in $(sh ${LIB_DIR}/utils/read_ini.sh ${PS_AGGREGATE_INI} ${i} condition); do
+      conditions=("${conditions[@]}" "${c/:/,}")
+    done
+    test "${aggregate}" == "" && continue
+    test ${#conditions[@]} -lt 1 && continue
+    printf "${FORMAT}" ps_aggregate ${RESULT_DATA_DIR}/ps_aggregate.${i}.csv \
+      "${i}:${aggregate}:$(IFS=#; echo "${conditions[*]}")"
   done
 fi
 
