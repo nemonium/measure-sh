@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: ps_count.sh
+#         FILE: fd_count.sh
 #
-#        USAGE: ps_count.sh -c condition [-c condition...] [-d delimiter] [-H] [-h]
+#        USAGE: fd_count.sh -c condition [-c condition...] [-d delimiter] [-H] [-h]
 #
-#  DESCRIPTION: Count the number of processes.
+#  DESCRIPTION: Count the number of File Descriptor.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -66,7 +66,12 @@ echo -en "${now_time:-`date +%H:%M:%S`}"
 
 for condition in "${CONDITIONS[@]}"
 do
-  echo -en "${DELIMITER:-\t}`ps axo ${condition%%,*}= | awk '/'"${condition#*,}"'/{print $0}' | wc -l`"
+  fd_total=0
+  for pid in `ps axo pid=,${condition%%,*}= | awk '/'"${condition#*,}"'/ && $1 != PROCINFO["pid"]{print $1}'`
+  do
+    fd_total=$(( ${fd_total} + `ls -d /proc/${pid}/fd/* 2>/dev/null | wc -l` ))
+  done
+  echo -en "${DELIMITER:-\t}${fd_total}"
 done
 
 echo ""

@@ -184,4 +184,15 @@ do
   add_button 'PS_AGGREGATE' `echo '<input class="btn_ps_aggregate" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
 done
 
+#-------------------------------------------------------------------------------
+# Add a button for viewing FD count results
+#-------------------------------------------------------------------------------
+grep "^fd_count${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+do
+  path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+  name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
+  conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f4- | sed 's/\"/\"\"/g'`"
+  add_button 'FD_COUNT' `echo '<input class="btn_fd_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+done
+
 exit 0

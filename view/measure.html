@@ -18,6 +18,7 @@
         closeAll($('.btn_line_count'));
         closeAll($('.btn_ps_count'));
         closeAll($('.btn_ps_aggregate'));
+        closeAll($('.btn_fd_count'));
 
         $(".btn_cpu_all").val(OPEN);
         $(".btn_network_all").val(OPEN);
@@ -27,6 +28,7 @@
         $(".btn_line_count_all").val(OPEN);
         $(".btn_ps_count_all").val(OPEN);
         $(".btn_ps_aggregate_all").val(OPEN);
+        $(".btn_fd_count_all").val(OPEN);
       });
 
       $(".btn_cpu_all").click(function() {
@@ -52,6 +54,9 @@
       });
       $(".btn_ps_aggregate_all").click(function() {
         clickAll($(this), $('.btn_ps_aggregate'));
+      });
+      $(".btn_fd_count_all").click(function() {
+        clickAll($(this), $('.btn_fd_count'));
       });
 
       $(".btn_mem").click(function() {
@@ -83,6 +88,9 @@
       });
       $(".btn_ps_aggregate").click(function() {
         createChart($(this), createChartOfPsAggregate);
+      });
+      $(".btn_fd_count").click(function() {
+        createChart($(this), createChartOfFdCount);
       });
     });
     </script>
@@ -159,6 +167,13 @@
         <input class="btn_all btn_ps_aggregate_all" type="button" value="Open" />
       </span>
       <!-- ###PS_AGGREGATE### -->
+    </div>
+    <div>
+      <span class="measure_title">FD Count</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_fd_count_all" type="button" value="Open" />
+      </span>
+      <!-- ###FD_COUNT### -->
     </div>
     <!-- ###CONTAINER### -->
   </body>

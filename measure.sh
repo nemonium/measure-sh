@@ -4,6 +4,7 @@
 #         FILE: measure.sh
 #
 #        USAGE: measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
+#                          [-l path] [-p path] [-a path] [-f path]
 #
 #  DESCRIPTION: Manage each performance measurement script.
 #
@@ -19,7 +20,7 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path] [-p path] [-a path]
+  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path] [-p path] [-a path] [-f path]
 
     -o <arg> : Specify results directory
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
@@ -35,6 +36,8 @@ Usage:
                Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_ps_count.ini'
     -a <arg> : ps_aggregate ini file path
                Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_ps_aggregate.ini'
+    -f <arg> : fd_count ini file path
+               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_fd_count.ini'
     -v       : Verbose
     -h       : Get help
 
@@ -62,6 +65,7 @@ MAP_DELIMITER=${MAP_DELIMITER:-:}
 MEASURE_LINE_COUNT_INI=${MEASURE_LINE_COUNT_INI:-${CONF_DIR}/measure_line_count.ini}
 MEASURE_PS_COUNT_INI=${MEASURE_PS_COUNT_INI:-${CONF_DIR}/measure_ps_count.ini}
 MEASURE_PS_AGGREGATE_INI=${MEASURE_PS_AGGREGATE_INI:-${CONF_DIR}/measure_ps_aggregate.ini}
+MEASURE_FD_COUNT_INI=${MEASURE_FD_COUNT_INI:-${CONF_DIR}/measure_fd_count.ini}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -72,11 +76,12 @@ test $? -gt 0 && exit 1
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "a:p:l:o:i:t:e:hv" OPT; do
+while getopts "l:p:a:f:o:i:t:e:hv" OPT; do
   case ${OPT} in
     l) MEASURE_LINE_COUNT_INI="${OPTARG}";;
     p) MEASURE_PS_COUNT_INI="${OPTARG}";;
     a) MEASURE_PS_AGGREGATE_INI="${OPTARG}";;
+    f) MEASURE_FD_COUNT_INI="${OPTARG}";;
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
@@ -110,7 +115,8 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} \
   -l ${MEASURE_LINE_COUNT_INI} \
   -a ${MEASURE_PS_AGGREGATE_INI} \
-  -p ${MEASURE_PS_COUNT_INI} > ${MEASURE_MAP}
+  -p ${MEASURE_PS_COUNT_INI} \
+  -f ${MEASURE_FD_COUNT_INI} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
 # Vabose
@@ -246,6 +252,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     conditions=( `echo ${line} | cut -d ${MAP_DELIMITER} -f4- | tr -s '#' ' '` )
+    unset condition_str
     for c in ${conditions[@]}; do
       condition_str="${condition_str} -c ${c}"
     done
@@ -254,7 +261,7 @@ do
 
   #-----------------------------------------------------------------------------
   # Process aggregate
-  # ps_aggregate:data/ps_aggregate.mem.csv:mem:pmem,%.1f:comm,httpd#comm,bash
+  #   ps_aggregate:data/ps_aggregate.mem.csv:mem:pmem,%.1f:comm,httpd#comm,bash
   #-----------------------------------------------------------------------------
   grep "^ps_aggregate${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
   do
@@ -267,6 +274,21 @@ do
       condition_str="${condition_str} -c ${c}"
     done
     sh ${LIB_DIR}/measure/ps_aggregate.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
+  done
+
+  #-----------------------------------------------------------------------------
+  # FD count
+  #   fd_count:data/fd_count.fd.csv:fd:comm,sendmail#comm,httpd
+  #-----------------------------------------------------------------------------
+  grep "^fd_count${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+  do
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    conditions=( `echo ${line} | cut -d ${MAP_DELIMITER} -f4- | tr -s '#' ' '` )
+    unset condition_str
+    for c in ${conditions[@]}; do
+      condition_str="${condition_str} -c ${c}"
+    done
+    sh ${LIB_DIR}/measure/fd_count.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
   done
 
   wait ${sleep_pid}

@@ -11,6 +11,7 @@ Measure the performance of the local host.
 
 ## Usage
     measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
+               [-l path] [-p path] [-a path] [-f path]
     
         -o <arg> : Specify results directory
                    Default : '$(cd $(dirname $0);pwd)/result-`date +%Y%m%d%H%M%S`'
@@ -25,6 +26,8 @@ Measure the performance of the local host.
                    Default : '$(cd $(dirname $0);pwd)/conf/measure_ps_count.ini'
         -a <arg> : ps_aggregate ini file path
                    Default : '$(cd $(dirname $0);pwd)/conf/measure_ps_aggregate.ini'
+        -f <arg> : fd_count ini file path
+                   Default : '$(cd $(dirname $0);pwd)/conf/measure_fd_count.ini'
         -v       : Verbose
         -h       : Get help
 
@@ -82,6 +85,13 @@ Measure the performance of the local host.
         aggregate=pmem:%.1f
         condition=comm:httpd
         condition=comm:bash
+
+### conf/measure_fd_count.ini
+
+- ex) If you aggregate the number of sendmail file descriptor.
+
+        [process]
+        condition=comm:sendmail
 
 ## Note
 1. After the script, Transfer measurement results to Local PC.
