@@ -1,0 +1,39 @@
+body, input {
+  font-family: monospace;
+}
+
+.btn_on {
+  background-color: salmon;
+}
+
+input {
+  background-color: ghostwhite;
+  border:           1px solid tomato;
+  border-radius:    5px;
+  margin:           3px 1px;
+}
+
+.measure_title {
+  width:   100px;
+  display: inline-block;
+}
+
+.measure_all_span {
+  width:   50px;
+  display: inline-block;
+}
+
+.btn_all {
+  width:            100%;
+  background-color: white;
+  border:           1px solid gray;
+  border-radius:    5px;
+  margin:           3px 1px;
+}
+
+.measure_container {
+  min-width: 300px;
+  height:    600px;
+  margin:    0 auto;
+  display:   none;
+}

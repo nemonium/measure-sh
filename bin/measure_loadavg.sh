@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_diskio.sh
+#         FILE: measure_loadavg.sh
 #
-#        USAGE: measure_diskio.sh [-d delimiter] [-t time] [-H] [-h] device
+#        USAGE: measure_loadavg.sh [-d delimiter] [-H] [-h]
 #
-#  DESCRIPTION: Measures the Disk IO
+#  DESCRIPTION: Measures the Load Average
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,14 +19,12 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h] device
+  ${0} [-d delimiter] [-H] [-h]
 
     -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
     -H       : Return header only
     -h       : Get help
 
-    device   : Specify Device
 EOF
 exit 0
 }
@@ -34,10 +32,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -49,24 +46,16 @@ shift $(( $OPTIND - 1 ))
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  iostat -kxd | \
-  awk -v OFS="${D:-\t}" '
-    NR==3 { print "Time", $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12 }
-  '
+  echo -e "Time${D:-\t}1min${D:-\t}5min${D:-\t}15min"
   exit 0
 fi
 
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-DEV=$1
-test ${#DEV} -eq 0 && usage
-
-ret=(`iostat -kxd ${DEV} 5 2 | awk -v DEV=${DEV} 'DEV=$1 {print}' | tail -1`)
-test ${#ret} -eq 0 && exit 0
-echo ${ret[@]} | \
-  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
-    { print TIME, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12 }
+cat /proc/loadavg | \
+  awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
+    { print TIME, $1, $2, $3 }
   '
 
 exit 0

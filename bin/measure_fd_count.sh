@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_network.sh
+#         FILE: measure_fd_count.sh
 #
-#        USAGE: measure_network.sh [-d delimiter] [-t time] [-i Interface] [-H] [-h]
+#        USAGE: measure_fd_count.sh -c condition [-c condition...] [-d delimiter] [-H] [-h]
 #
-#  DESCRIPTION: Measures the Network torrific
+#  DESCRIPTION: Count the number of File Descriptor.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,13 +19,14 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-i Interface] [-H] [-h]
+  ${0} -c condition [-c condition...] [-d delimiter] [-H] [-h] 
 
-    -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
-    -i <arg> : Specify Interface
-    -H       : Return header only
-    -h       : Get help
+    -d <arg>  : Result delimiter
+                default : \\t
+    -c <arg>  : ps user defined and condition
+                format  : <user-defined>,<condition>
+    -H        : Return header only
+    -h        : Get help
 
 EOF
 exit 0
@@ -34,37 +35,45 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:i:Hh" OPT; do
+while getopts "c:d:Hh" OPT; do
   case ${OPT} in
-    d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
-    i) I="${OPTARG}";;
+    c) CONDITIONS=("${CONDITIONS[@]}" "${OPTARG}");;
+    d) DELIMITER="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
 done
-
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  netstat -I"${I:-lo}" | \
-    grep ^Iface | \
-    awk -v OFS="${D:-\t}" '
-      { print "Time", $4, $5, $6, $7, $8, $9, $10, $11 }
-    '
+  echo -en "Time"
+  for condition in "${CONDITIONS[@]}"
+  do
+    echo -en "${DELIMITER:-\t}${condition#*:}"
+  done
+  echo ""
   exit 0
 fi
 
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-netstat -I"${I:-lo}" | \
-  grep "^${I:-lo}" | \
-  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
-    { print TIME, $4, $5, $6, $7, $8, $9, $10, $11 }
-  '
+
+echo -en "${now_time:-`date +%H:%M:%S`}"
+
+for condition in "${CONDITIONS[@]}"
+do
+  fd_total=0
+  for pid in `ps axo pid=,${condition%%,*}= | awk '/'"${condition#*,}"'/ && $1 != PROCINFO["pid"]{print $1}'`
+  do
+    fd_total=$(( ${fd_total} + `ls -d /proc/${pid}/fd/* 2>/dev/null | wc -l` ))
+  done
+  echo -en "${DELIMITER:-\t}${fd_total}"
+done
+
+echo ""
 
 exit 0

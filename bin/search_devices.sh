@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_diskuse.sh
+#         FILE: search_devices.sh
 #
-#        USAGE: measure_diskuse.sh [-d delimiter] [-t time] [-H] [-h] mounted
+#        USAGE: search_devices.sh [-d delimiter][-h]
 #
-#  DESCRIPTION: Measures the Disk Use
+#  DESCRIPTION: Search device list.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,14 +19,12 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h] mounted
+  ${0} [-d delimiter][-h]
 
-    -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
-    -H       : Return header only
+    -d <arg> : Delimiter of Result
+               Default : ' ' (space)
     -h       : Get help
 
-    mounted  : Specify Device
 EOF
 exit 0
 }
@@ -34,39 +32,24 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:h" OPT; do
   case ${OPT} in
-    d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
-    H) HEAD=1;;
+    d) DELIMITER="${OPTARG}";;
     h|:|\?) usage;;
   esac
 done
-
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Return the Header
+# Search devices
 #-------------------------------------------------------------------------------
-if [ "${HEAD}" ]; then
-  df | \
-  awk -v OFS="${D:-\t}" '
-    NR==1 { print "Time", $2, $3, $4, $5 }
-  '
-  exit 0
-fi
+s_nr=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
+e_nr=`iostat -xd  | wc -l`
+rt=$(iostat -xd | awk -v FS=" " -v snr=${s_nr} -v enr=${e_nr} '
+  NR==snr,NR==enr{
+    print $1
+  }' | grep -v '^$')
 
-#-------------------------------------------------------------------------------
-# Measure
-#-------------------------------------------------------------------------------
-MNT=$1
-test ${#MNT} -eq 0 && usage
-
-ret=(`df ${MNT} | awk 'NR>=2 {print}'`)
-test ${#ret} -eq 0 && exit 0
-echo ${ret[@]} | \
-  awk -v OFS="${D:-\t}" -v TIME="${T:-`date +%H:%M:%S`}" '
-    { print TIME, $2, $3, $4, $5 }
-  '
+echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 
 exit 0

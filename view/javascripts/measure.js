@@ -1,3 +1,52 @@
+const OPEN = 'Open'
+const CLOSE = 'Close'
+
+function isOpen(obj){
+  targetId = $(obj).attr("target");
+  return ($("#" + targetId).is(':visible'));
+}
+
+function canClick(obj, act) {
+  return ((!isOpen(obj) && act == OPEN) || (isOpen(obj) && act == CLOSE));
+}
+
+function closeAll(btnGroup) {
+  for (var i = 0; i < btnGroup.length; i++) {
+    if (canClick(btnGroup.eq(i), CLOSE)) {
+      btnGroup.eq(i).click();
+    }
+  }
+}
+
+function clickAll(allBtn, btnGroup) {
+  for (var i = 0; i < btnGroup.length; i++) {
+    if (canClick(btnGroup.eq(i), allBtn.val())) {
+      btnGroup.eq(i).click();
+    }
+  }
+  if (allBtn.val() == OPEN) {
+    allBtn.val(CLOSE);
+  } else {
+    allBtn.val(OPEN);
+  }
+}
+
+function createChart(obj, func) {
+  src = obj.attr("src");
+  targetId = obj.attr("target");
+  option = obj.attr("option");
+  if ($("#" + targetId).is(':visible')) {
+    obj.removeClass('btn_on');
+    $("#" + targetId).hide();
+  } else {
+    obj.addClass('btn_on');
+    $("#" + targetId).show();
+    if ($("#" + targetId).attr("data-highcharts-chart") == undefined) {
+      func(src, targetId, option);
+    }
+  }
+}
+
 function getMeasuresFloat(measures, attr) {
   var rt = [];
   for (var i = 0; i < measures.length; i++) {
@@ -49,7 +98,7 @@ function doOrderGuaranteedAjax(ajaxOptionArray, allCompleteHandler){
   $.ajax(opts);
 }
 
-function createChartOfCpu(filePath) {
+function createChartOfCpu(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -99,7 +148,7 @@ function createChartOfCpu(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'area'
       },
@@ -158,7 +207,7 @@ function createChartOfCpu(filePath) {
   });
 }
 
-function createChartOfMemory(filePath) {
+function createChartOfMemory(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -236,7 +285,7 @@ function createChartOfMemory(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'area'
       },
@@ -289,7 +338,7 @@ function createChartOfMemory(filePath) {
   });
 }
 
-function createChartOfLoadavg(filePath) {
+function createChartOfLoadavg(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -320,7 +369,7 @@ function createChartOfLoadavg(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -372,7 +421,7 @@ function createChartOfLoadavg(filePath) {
   });
 }
 
-function createChartOfNetwork(filePath) {
+function createChartOfNetwork(filePath, targetId, interval) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -403,7 +452,7 @@ function createChartOfNetwork(filePath) {
       var s = measures[i - 1][attr];
       var e = measures[i][attr];
       if (!$.isEmptyObject(s) && !$.isEmptyObject(e)) {
-        rt.push(parseFloat(e) - parseFloat(s));
+        rt.push((parseFloat(e) - parseFloat(s)) / interval);
       }
     }
     return rt;
@@ -422,7 +471,7 @@ function createChartOfNetwork(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -473,7 +522,7 @@ function createChartOfNetwork(filePath) {
   });
 }
 
-function createChartOfDiskIO(filePath) {
+function createChartOfDiskIO(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -510,7 +559,7 @@ function createChartOfDiskIO(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -558,7 +607,7 @@ function createChartOfDiskIO(filePath) {
   });
 }
 
-function createChartOfDiskUsage(filePath) {
+function createChartOfDiskUsage(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -586,7 +635,7 @@ function createChartOfDiskUsage(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -636,7 +685,7 @@ function createChartOfDiskUsage(filePath) {
   });
 }
 
-function createChartOfDiskUtil(filePath) {
+function createChartOfDiskUtil(filePath, targetId) {
   function getArrayMeasures(data) {
     var rt = [];
     $.each(data.split('\n'), function() {
@@ -672,7 +721,7 @@ function createChartOfDiskUtil(filePath) {
   }});
 
   doOrderGuaranteedAjax(optionArray, function(data){
-    $('#container').highcharts({
+    $("#" + targetId).highcharts({
       chart: {
         type: 'spline'
       },
@@ -719,6 +768,343 @@ function createChartOfDiskUtil(filePath) {
       series: [
         { name: 'disk_util', data: p_util },
       ]
+    });
+  });
+}
+
+function createChartOfLineCount(filePath, targetId, opt) {
+
+  var fileName = opt.split(":")[0];
+  var conditions = opt.split(":")[1].split("#");
+
+  function getArrayMeasures(data) {
+    var rt = [];
+    $.each(data.split('\n'), function() {
+      var m = this.split(',');
+      var o = new Object();
+      o["time"] = m[0];
+      $.each(conditions, function(index, elem) {
+        o[elem] = m[index + 1];
+      });
+      rt.push(o);
+    });
+    return rt;
+  }
+
+  var times;
+  var values = new Object;
+  var optionArray = [];
+  optionArray.push({opt: {url: filePath},
+    func: function(data){
+      var measures = getArrayMeasures(data);
+      times = getMeasuresStr(measures, 'time');
+      $.each(conditions, function(index, elem) {
+        values[elem] = getMeasuresFloat(measures, elem);
+      });
+  }});
+
+  doOrderGuaranteedAjax(optionArray, function(data){
+
+    var series = new Array();
+    $.each(conditions, function(index, elem) {
+      series.push({ name: elem, marker: { symbol: 'diamond' }, data: values[elem] })
+    });
+
+    $("#" + targetId).highcharts({
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: fileName
+      },
+      subtitle: {
+        text: filePath
+      },
+      xAxis: {
+        title: {
+          text: 'Time'
+        },
+        categories: times,
+        tickInterval: parseInt(times.length / 10)
+      },
+      yAxis: {
+        title: {
+          text: 'Count'
+        },
+        labels: {
+          formatter: function() {
+            return this.value
+          }
+        },
+        min: 0
+      },
+      tooltip: {
+        crosshairs: true,
+        shared: true
+      },
+      plotOptions: {
+        spline: {
+          marker: {
+            enabled: false,
+            radius: 4,
+            lineColor: '#666666',
+            lineWidth: 1
+          }
+        }
+      },
+      series: series
+    });
+  });
+}
+
+function createChartOfPsCount(filePath, targetId, opt) {
+
+  var conditions = opt.split("#");
+
+  function getArrayMeasures(data) {
+    var rt = [];
+    $.each(data.split('\n'), function() {
+      var m = this.split(',');
+      var o = new Object();
+      o["time"] = m[0];
+      $.each(conditions, function(index, elem) {
+        o[elem] = m[index + 1];
+      });
+      rt.push(o);
+    });
+    return rt;
+  }
+
+  var times;
+  var values = new Object;
+  var optionArray = [];
+  optionArray.push({opt: {url: filePath},
+    func: function(data){
+      var measures = getArrayMeasures(data);
+      times = getMeasuresStr(measures, 'time');
+      $.each(conditions, function(index, elem) {
+        values[elem] = getMeasuresFloat(measures, elem);
+      });
+  }});
+
+  doOrderGuaranteedAjax(optionArray, function(data){
+
+    var series = new Array();
+    $.each(conditions, function(index, elem) {
+      series.push({ name: elem, marker: { symbol: 'diamond' }, data: values[elem] })
+    });
+
+    $("#" + targetId).highcharts({
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: 'Process Count'
+      },
+      subtitle: {
+        text: filePath
+      },
+      xAxis: {
+        title: {
+          text: 'Time'
+        },
+        categories: times,
+        tickInterval: parseInt(times.length / 10)
+      },
+      yAxis: {
+        title: {
+          text: 'Count'
+        },
+        labels: {
+          formatter: function() {
+            return this.value
+          }
+        },
+        min: 0
+      },
+      tooltip: {
+        crosshairs: true,
+        shared: true
+      },
+      plotOptions: {
+        spline: {
+          marker: {
+            enabled: false,
+            radius: 4,
+            lineColor: '#666666',
+            lineWidth: 1
+          }
+        }
+      },
+      series: series
+    });
+  });
+}
+
+function createChartOfPsAggregate(filePath, targetId, opt) {
+
+  var conditions = opt.split("#");
+
+  function getArrayMeasures(data) {
+    var rt = [];
+    $.each(data.split('\n'), function() {
+      var m = this.split(',');
+      var o = new Object();
+      o["time"] = m[0];
+      $.each(conditions, function(index, elem) {
+        o[elem] = m[index + 1];
+      });
+      rt.push(o);
+    });
+    return rt;
+  }
+
+  var times;
+  var values = new Object;
+  var optionArray = [];
+  optionArray.push({opt: {url: filePath},
+    func: function(data){
+      var measures = getArrayMeasures(data);
+      times = getMeasuresStr(measures, 'time');
+      $.each(conditions, function(index, elem) {
+        values[elem] = getMeasuresFloat(measures, elem);
+      });
+  }});
+
+  doOrderGuaranteedAjax(optionArray, function(data){
+
+    var series = new Array();
+    $.each(conditions, function(index, elem) {
+      series.push({ name: elem, marker: { symbol: 'diamond' }, data: values[elem] })
+    });
+
+    $("#" + targetId).highcharts({
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: 'Process Aggregate'
+      },
+      subtitle: {
+        text: filePath
+      },
+      xAxis: {
+        title: {
+          text: 'Time'
+        },
+        categories: times,
+        tickInterval: parseInt(times.length / 10)
+      },
+      yAxis: {
+        title: {
+          text: 'Value'
+        },
+        labels: {
+          formatter: function() {
+            return this.value
+          }
+        },
+        min: 0
+      },
+      tooltip: {
+        crosshairs: true,
+        shared: true
+      },
+      plotOptions: {
+        spline: {
+          marker: {
+            enabled: false,
+            radius: 4,
+            lineColor: '#666666',
+            lineWidth: 1
+          }
+        }
+      },
+      series: series
+    });
+  });
+}
+
+function createChartOfFdCount(filePath, targetId, opt) {
+
+  var conditions = opt.split("#");
+
+  function getArrayMeasures(data) {
+    var rt = [];
+    $.each(data.split('\n'), function() {
+      var m = this.split(',');
+      var o = new Object();
+      o["time"] = m[0];
+      $.each(conditions, function(index, elem) {
+        o[elem] = m[index + 1];
+      });
+      rt.push(o);
+    });
+    return rt;
+  }
+
+  var times;
+  var values = new Object;
+  var optionArray = [];
+  optionArray.push({opt: {url: filePath},
+    func: function(data){
+      var measures = getArrayMeasures(data);
+      times = getMeasuresStr(measures, 'time');
+      $.each(conditions, function(index, elem) {
+        values[elem] = getMeasuresFloat(measures, elem);
+      });
+  }});
+
+  doOrderGuaranteedAjax(optionArray, function(data){
+
+    var series = new Array();
+    $.each(conditions, function(index, elem) {
+      series.push({ name: elem, marker: { symbol: 'diamond' }, data: values[elem] })
+    });
+
+    $("#" + targetId).highcharts({
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: 'File Descriptor Count'
+      },
+      subtitle: {
+        text: filePath
+      },
+      xAxis: {
+        title: {
+          text: 'Time'
+        },
+        categories: times,
+        tickInterval: parseInt(times.length / 10)
+      },
+      yAxis: {
+        title: {
+          text: 'Count'
+        },
+        labels: {
+          formatter: function() {
+            return this.value
+          }
+        },
+        min: 0
+      },
+      tooltip: {
+        crosshairs: true,
+        shared: true
+      },
+      plotOptions: {
+        spline: {
+          marker: {
+            enabled: false,
+            radius: 4,
+            lineColor: '#666666',
+            lineWidth: 1
+          }
+        }
+      },
+      series: series
     });
   });
 }

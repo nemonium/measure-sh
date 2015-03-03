@@ -1,0 +1,180 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script type="text/javascript" src="javascripts/measure.js"></script>
+    <script type="text/javascript">
+    $(function() {
+      $(".btn_close_all").click(function() {
+        closeAll($('.btn_mem'));
+        closeAll($('.btn_cpu'));
+        closeAll($('.btn_loadavg'));
+        closeAll($('.btn_network'));
+        closeAll($('.btn_diskio'));
+        closeAll($('.btn_diskutil'));
+        closeAll($('.btn_diskuse'));
+        closeAll($('.btn_line_count'));
+        closeAll($('.btn_ps_count'));
+        closeAll($('.btn_ps_aggregate'));
+        closeAll($('.btn_fd_count'));
+
+        $(".btn_cpu_all").val(OPEN);
+        $(".btn_network_all").val(OPEN);
+        $(".btn_diskio_all").val(OPEN);
+        $(".btn_diskutil_all").val(OPEN);
+        $(".btn_diskuse_all").val(OPEN);
+        $(".btn_line_count_all").val(OPEN);
+        $(".btn_ps_count_all").val(OPEN);
+        $(".btn_ps_aggregate_all").val(OPEN);
+        $(".btn_fd_count_all").val(OPEN);
+      });
+
+      $(".btn_cpu_all").click(function() {
+        clickAll($(this), $('.btn_cpu'));
+      });
+      $(".btn_network_all").click(function() {
+        clickAll($(this), $('.btn_network'));
+      });
+      $(".btn_diskio_all").click(function() {
+        clickAll($(this), $('.btn_diskio'));
+      });
+      $(".btn_diskutil_all").click(function() {
+        clickAll($(this), $('.btn_diskutil'));
+      });
+      $(".btn_diskuse_all").click(function() {
+        clickAll($(this), $('.btn_diskuse'));
+      });
+      $(".btn_line_count_all").click(function() {
+        clickAll($(this), $('.btn_line_count'));
+      });
+      $(".btn_ps_count_all").click(function() {
+        clickAll($(this), $('.btn_ps_count'));
+      });
+      $(".btn_ps_aggregate_all").click(function() {
+        clickAll($(this), $('.btn_ps_aggregate'));
+      });
+      $(".btn_fd_count_all").click(function() {
+        clickAll($(this), $('.btn_fd_count'));
+      });
+
+      $(".btn_mem").click(function() {
+        createChart($(this), createChartOfMemory);
+      });
+      $(".btn_cpu").click(function() {
+        createChart($(this), createChartOfCpu);
+      });
+      $(".btn_loadavg").click(function() {
+        createChart($(this), createChartOfLoadavg);
+      });
+      $(".btn_network").click(function() {
+        createChart($(this), createChartOfNetwork);
+      });
+      $(".btn_diskio").click(function() {
+        createChart($(this), createChartOfDiskIO);
+      });
+      $(".btn_diskutil").click(function() {
+        createChart($(this), createChartOfDiskUtil);
+      });
+      $(".btn_diskuse").click(function() {
+        createChart($(this), createChartOfDiskUsage);
+      });
+      $(".btn_line_count").click(function() {
+        createChart($(this), createChartOfLineCount);
+      });
+      $(".btn_ps_count").click(function() {
+        createChart($(this), createChartOfPsCount);
+      });
+      $(".btn_ps_aggregate").click(function() {
+        createChart($(this), createChartOfPsAggregate);
+      });
+      $(".btn_fd_count").click(function() {
+        createChart($(this), createChartOfFdCount);
+      });
+    });
+    </script>
+    <link href="stylesheets/measure.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <div>
+      <span style="width: 160px; display: inline-block;">
+        <input class="btn_all btn_close_all" type="button" value="Close all" />
+      </span>
+    </div>
+    <div>
+      <span class="measure_title">Memory</span>
+      <span class="measure_all_span"></span>
+      <!-- ###MEMORY### -->
+    </div>
+    <div>
+      <span class="measure_title">Cpu</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_cpu_all" type="button" value="Open" />
+      </span>
+      <!-- ###CPU### -->
+    </div>
+    <div>
+      <span class="measure_title">LoadAverage</span>
+      <span class="measure_all_span"></span>
+      <!-- ###LOAD_AVERAGE### -->
+    </div>
+    <div>
+      <span class="measure_title">Network</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_network_all" type="button" value="Open" />
+      </span>
+      <!-- ###NETWORK### -->
+    </div>
+    <div>
+      <span class="measure_title">DiskIO</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_diskio_all" type="button" value="Open" />
+      </span>
+      <!-- ###DISK_IO### -->
+    </div>
+    <div>
+      <span class="measure_title">DiskUtil</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_diskutil_all" type="button" value="Open" />
+      </span>
+      <!-- ###DISK_UTIL### -->
+    </div>
+    <div>
+      <span class="measure_title">DiskUsage</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_diskuse_all" type="button" value="Open" />
+      </span>
+      <!-- ###DISK_USAGE### -->
+    </div>
+    <div>
+      <span class="measure_title">Line Count</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_line_count_all" type="button" value="Open" />
+      </span>
+      <!-- ###LINE_COUNT### -->
+    </div>
+    <div>
+      <span class="measure_title">Ps Count</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_ps_count_all" type="button" value="Open" />
+      </span>
+      <!-- ###PS_COUNT### -->
+    </div>
+    <div>
+      <span class="measure_title">Ps Aggregate</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_ps_aggregate_all" type="button" value="Open" />
+      </span>
+      <!-- ###PS_AGGREGATE### -->
+    </div>
+    <div>
+      <span class="measure_title">FD Count</span>
+      <span class="measure_all_span">
+        <input class="btn_all btn_fd_count_all" type="button" value="Open" />
+      </span>
+      <!-- ###FD_COUNT### -->
+    </div>
+    <!-- ###CONTAINER### -->
+  </body>
+</html>

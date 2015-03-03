@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_memory.sh
+#         FILE: measure_diskio.sh
 #
-#        USAGE: measure_memory.sh [-d delimiter] [-t time] [-H] [-h]
+#        USAGE: measure_diskio.sh [-d delimiter] [-H] [-h] device
 #
-#  DESCRIPTION: Measures the Memory
+#  DESCRIPTION: Measures the Disk IO
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,12 +19,12 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-t time] [-H] [-h]
+  ${0} [-d delimiter] [-H] [-h] device
 
     -d <arg> : Specify delimiter
-    -t <arg> : Specify date and time to be displayed
     -H       : Return header only
     -h       : Get help
+    device   : Specify Device
 
 EOF
 exit 0
@@ -33,10 +33,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:t:Hh" OPT; do
+while getopts "d:Hh" OPT; do
   case ${OPT} in
     d) D="${OPTARG}";;
-    t) T="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -48,38 +47,24 @@ shift $(( $OPTIND - 1 ))
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  vmstat -s | \
-    awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
-      BEGIN {
-        printf "Time" D
-      }
-      NR!=COL {
-        for ( i = 2; i < NF; i++ ) {
-          printf "%s_", $i
-        }
-        printf $NF D
-      }
-      NR==COL {
-        print $2
-      }
-    '
+  iostat -kxd | \
+  awk -v OFS="${D:-\t}" '
+    NR==3 { print "Time", $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12 }
+  '
   exit 0
 fi
 
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-vmstat -s | \
-  awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
-    BEGIN {
-      printf TIME D
-    }
-    NR!=COL {
-      printf $1 D 
-    }
-    NR==COL {
-      print $1
-    }
+DEV=$1
+test ${#DEV} -eq 0 && usage
+
+ret=(`iostat -kxd ${DEV} 5 2 | awk -v DEV=${DEV} 'DEV=$1 {print}' | tail -1`)
+test ${#ret} -eq 0 && exit 0
+echo ${ret[@]} | \
+  awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
+    { print TIME, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12 }
   '
 
 exit 0
