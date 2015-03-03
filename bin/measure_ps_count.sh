@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: line_count.sh
+#         FILE: measure_ps_count.sh
 #
-#        USAGE: line_count.sh [-d delimiter] [-D delay] [-T directory] [-H] [-h] condition
+#        USAGE: measure_ps_count.sh -c condition [-c condition...] [-d delimiter] [-H] [-h]
 #
-#  DESCRIPTION: count the number of rows that were in condition
+#  DESCRIPTION: Count the number of processes.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,18 +19,14 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-D delay] [-T directory] [-H] [-h] condition
+  ${0} -c condition [-c condition...] [-d delimiter] [-H] [-h] 
 
     -d <arg>  : Result delimiter
                 default : \\t
-    -D <arg>  : Interval to aggregate
-                default : 5 sec
-    -T <arg>  : Temporary directory
-                default : /var/tmp
+    -c <arg>  : ps user defined and condition
+                format  : <user-defined>,<condition>
     -H        : Return header only
     -h        : Get help
-    condition : filename and grep keywords
-                format  : filename:keyword[#keyword...]
 
 EOF
 exit 0
@@ -39,11 +35,10 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:D:T:Hh" OPT; do
+while getopts "c:d:Hh" OPT; do
   case ${OPT} in
+    c) CONDITIONS=("${CONDITIONS[@]}" "${OPTARG}");;
     d) DELIMITER="${OPTARG}";;
-    D) DELAY="${OPTARG}";;
-    T) TMP_DIR="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
@@ -54,12 +49,10 @@ shift $(( $OPTIND - 1 ))
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  echo -en "Time${DELIMITER:-\t}"
-  echo "${@}" | cut -d: -f2- | tr -s '#' '\n' | while read keyword
+  echo -en "Time"
+  for condition in "${CONDITIONS[@]}"
   do
-    test ${m_col:-0} -gt 0 && echo -ne "${DELIMITER:-\t}"
-    echo -ne "${keyword}"
-    m_col=1
+    echo -en "${DELIMITER:-\t}${condition#*:}"
   done
   echo ""
   exit 0
@@ -68,27 +61,14 @@ fi
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-TMP_DIR=${TMP_DIR:-/var/tmp}; test ! -d ${TMP_DIR} && mkdir -p ${TMP_DIR}
-TMP_FILE=${TMP_DIR}/$$.${0##*/}
-DELAY=${DELAY:-5}
 
-filename=`echo "${@}" | cut -d: -f1`
-test ! -f "${filename}" && exit 1
+echo -en "${now_time:-`date +%H:%M:%S`}"
 
-sleep ${DELAY} &
-pid=$!
-tail -n 0 --pid=${pid} -F ${filename} > ${TMP_FILE}
-
-echo -ne "${now_time:-`date +%H:%M:%S`}${DELIMITER:-\t}"
-echo "${@}" | cut -d: -f2- | tr -s '#' '\n' | while read keyword
+for condition in "${CONDITIONS[@]}"
 do
-  total=`grep "${keyword}" ${TMP_FILE} | wc -l`
-  test ${m_col:-0} -gt 0 && echo -ne "${DELIMITER:-\t}"
-  echo -ne `expr ${total} / ${DELAY}`
-  m_col=1
+  echo -en "${DELIMITER:-\t}`ps axo ${condition%%,*}= | awk '/'"${condition#*,}"'/{print $0}' | wc -l`"
 done
-echo ""
 
-rm ${TMP_FILE}
+echo ""
 
 exit 0

@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: memory.sh
+#         FILE: measure_diskuse.sh
 #
-#        USAGE: memory.sh [-d delimiter] [-H] [-h]
+#        USAGE: measure_diskuse.sh [-d delimiter] [-H] [-h] mounted
 #
-#  DESCRIPTION: Measures the Memory
+#  DESCRIPTION: Measures the Disk Use
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,11 +19,12 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-H] [-h]
+  ${0} [-d delimiter] [-H] [-h] mounted
 
     -d <arg> : Specify delimiter
     -H       : Return header only
     -h       : Get help
+    mounted  : Specify Device
 
 EOF
 exit 0
@@ -46,38 +47,24 @@ shift $(( $OPTIND - 1 ))
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  vmstat -s | \
-    awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
-      BEGIN {
-        printf "Time" D
-      }
-      NR!=COL {
-        for ( i = 2; i < NF; i++ ) {
-          printf "%s_", $i
-        }
-        printf $NF D
-      }
-      NR==COL {
-        print $2
-      }
-    '
+  df | \
+  awk -v OFS="${D:-\t}" '
+    NR==1 { print "Time", $2, $3, $4, $5 }
+  '
   exit 0
 fi
 
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-vmstat -s | \
-  awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${now_time:-`date +%H:%M:%S`}" '
-    BEGIN {
-      printf TIME D
-    }
-    NR!=COL {
-      printf $1 D
-    }
-    NR==COL {
-      print $1
-    }
+MNT=$1
+test ${#MNT} -eq 0 && usage
+
+ret=(`df ${MNT} | awk 'NR>=2 {print}'`)
+test ${#ret} -eq 0 && exit 0
+echo ${ret[@]} | \
+  awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
+    { print TIME, $2, $3, $4, $5 }
   '
 
 exit 0

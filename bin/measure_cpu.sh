@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: mounted_dir.sh
+#         FILE: measure_cpu.sh
 #
-#        USAGE: mounted_dir.sh [-d delimiter][-h]
+#        USAGE: measure_cpu.sh [-d delimiter] [-c CPU] [-H] [-h]
 #
-#  DESCRIPTION: Search mounted directories.
+#  DESCRIPTION: Meaures the CPU
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,10 +19,11 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter][-h]
+  ${0} [-d delimiter] [-c CPU] [-H] [-h]
 
-    -d <arg> : Delimiter of Result
-               Default : ' ' (space)
+    -d <arg> : Specify delimiter
+    -c <arg> : Specify CPU
+    -H       : Return header only
     -h       : Get help
 
 EOF
@@ -32,19 +33,38 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:h" OPT; do
+while getopts "d:c:Hh" OPT; do
   case ${OPT} in
-    d) DELIMITER="${OPTARG}";;
+    d) D="${OPTARG}";;
+    c) C="${OPTARG}";;
+    H) HEAD=1;;
     h|:|\?) usage;;
   esac
 done
+
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Search mounted directories
+# Return the Header
 #-------------------------------------------------------------------------------
-rt=$(df -P | awk 'NR>1{print $6}')
+if [ "${HEAD}" ]; then
+  mpstat -P ALL | awk -v OFS="${D:-\t}" '
+    $3=="CPU" {
+      print "Time", $4, $5, $6, $7, $8, $9, $10, $11, $12
+    }
+  '
+  exit 0
+fi
 
-echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
+#-------------------------------------------------------------------------------
+# Measure
+#-------------------------------------------------------------------------------
+mpstat -P ALL 1 1 | \
+  grep -v ^Average | \
+  awk -v CPUNO=${C:-"all"} -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
+    $3==CPUNO {
+      print TIME, $4, $5, $6, $7, $8, $9, $10, $11, $12
+    }
+  '
 
 exit 0

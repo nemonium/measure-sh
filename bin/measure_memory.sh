@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: loadavg.sh
+#         FILE: measure_memory.sh
 #
-#        USAGE: loadavg.sh [-d delimiter] [-H] [-h]
+#        USAGE: measure_memory.sh [-d delimiter] [-H] [-h]
 #
-#  DESCRIPTION: Measures the Load Average
+#  DESCRIPTION: Measures the Memory
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -46,16 +46,38 @@ shift $(( $OPTIND - 1 ))
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  echo -e "Time${D:-\t}1min${D:-\t}5min${D:-\t}15min"
+  vmstat -s | \
+    awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${T:-`date +%H:%M:%S`}" '
+      BEGIN {
+        printf "Time" D
+      }
+      NR!=COL {
+        for ( i = 2; i < NF; i++ ) {
+          printf "%s_", $i
+        }
+        printf $NF D
+      }
+      NR==COL {
+        print $2
+      }
+    '
   exit 0
 fi
 
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-cat /proc/loadavg | \
-  awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
-    { print TIME, $1, $2, $3 }
+vmstat -s | \
+  awk -v D="${D:-\t}" -v COL=`vmstat -s | wc -l` -v TIME="${now_time:-`date +%H:%M:%S`}" '
+    BEGIN {
+      printf TIME D
+    }
+    NR!=COL {
+      printf $1 D
+    }
+    NR==COL {
+      print $1
+    }
   '
 
 exit 0

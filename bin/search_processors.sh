@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: devices.sh
+#         FILE: search_processors.sh
 #
-#        USAGE: devices.sh [-d delimiter][-h]
+#        USAGE: search_processors.sh [-d delimiter][-h]
 #
-#  DESCRIPTION: Search device list.
+#  DESCRIPTION: Search cpu processor list.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -41,14 +41,14 @@ done
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Search devices
+# Search processors
 #-------------------------------------------------------------------------------
-s_nr=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
-e_nr=`iostat -xd  | wc -l`
-rt=$(iostat -xd | awk -v FS=" " -v snr=${s_nr} -v enr=${e_nr} '
-  NR==snr,NR==enr{
-    print $1
-  }' | grep -v '^$')
+rt=$(cat /proc/cpuinfo | grep ^processor | awk -v FS=: '
+  {
+    sub (/[ \t]+$/, "", $2);
+    sub (/^[ \t]+/, "", $2);
+    print $2
+  }')
 
 echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 

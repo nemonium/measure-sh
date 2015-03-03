@@ -1,9 +1,9 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: create_chart.sh
+#         FILE: add_measure_tags.sh
 #
-#        USAGE: create_chart.sh [-o directory] [-i interval] [-d delimiter] [-h] measure-map
+#        USAGE: add_measure_tags.sh [-o directory] [-i interval] [-d delimiter] [-h] measure-map
 #
 #  DESCRIPTION: Create Visualize Tool
 #

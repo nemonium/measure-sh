@@ -1,9 +1,9 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: measure_map.sh
+#         FILE: make_measure_map.sh
 #
-#        USAGE: measure_map.sh [-a paht][-f path][-p path][-l path][-d delimiter][-h]
+#        USAGE: make_measure_map.sh [-a paht][-f path][-p path][-l path][-d delimiter][-h]
 #
 #  DESCRIPTION: Make measure map string
 #
@@ -72,7 +72,7 @@ printf "${FORMAT}" loadavg  ${RESULT_DATA_DIR}/loadavg.csv       LoadAverage
 #   Format : cpu:<data_path>:<name>
 #-------------------------------------------------------------------------------
 printf "${FORMAT}" cpu      ${RESULT_DATA_DIR}/cpu.all.csv       all
-for i in $( sh ${LIB_DIR}/search/processors.sh ); do
+for i in $( sh ${TOOL_BIN_DIR}/search_processors.sh ); do
 printf "${FORMAT}" cpu      ${RESULT_DATA_DIR}/cpu.${i}.csv      ${i}
 done
 
@@ -80,7 +80,7 @@ done
 # search network interfaces
 #   Format : network:<data_path>:<name>
 #-------------------------------------------------------------------------------
-for i in $( sh ${LIB_DIR}/search/network_ifaces.sh ); do
+for i in $( sh ${TOOL_BIN_DIR}/search_network_ifaces.sh ); do
 printf "${FORMAT}" network  ${RESULT_DATA_DIR}/network.${i}.csv  ${i}
 done
 
@@ -88,7 +88,7 @@ done
 # search devices
 #   Format : device:<data_path>:<name>
 #-------------------------------------------------------------------------------
-for i in $( sh ${LIB_DIR}/search/devices.sh ); do
+for i in $( sh ${TOOL_BIN_DIR}/search_devices.sh ); do
 f=`echo ${i} | openssl md5 | sed 's/^.* //'`
 printf "${FORMAT}" device   ${RESULT_DATA_DIR}/device.${f}.csv   ${i}
 done
@@ -97,7 +97,7 @@ done
 # search mounted directories
 #   Format : mount:<data_path>:<name>
 #-------------------------------------------------------------------------------
-for i in $( sh ${LIB_DIR}/search/mounted_dir.sh ); do
+for i in $( sh ${TOOL_BIN_DIR}/search_mounted_dir.sh ); do
 f=`echo ${i} | openssl md5 | sed 's/^.* //'`
 printf "${FORMAT}" mount    ${RESULT_DATA_DIR}/mount.${f}.csv    ${i}
 done
@@ -116,9 +116,9 @@ done
 #-------------------------------------------------------------------------------
 if [ -f "${LINE_COUNT_INI}" ]; then
   for i in $( egrep "^\[.+\]$" ${LINE_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
-    test "`sh ${LIB_DIR}/make/line_count_condition.sh ${LINE_COUNT_INI} ${i}`" == "" && continue
+    test "`sh ${TOOL_BIN_DIR}/line_count_condition.sh ${LINE_COUNT_INI} ${i}`" == "" && continue
     printf "${FORMAT}" line_count ${RESULT_DATA_DIR}/line_count.${i}.csv \
-      "${i}:`sh ${LIB_DIR}/make/line_count_condition.sh ${LINE_COUNT_INI} ${i}`"
+      "${i}:`sh ${TOOL_BIN_DIR}/line_count_condition.sh ${LINE_COUNT_INI} ${i}`"
   done
 fi
 
@@ -135,7 +135,7 @@ fi
 if [ -f "${PS_COUNT_INI}" ]; then
   for i in $( egrep "^\[.+\]$" ${PS_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
     unset conditions
-    for c in $(sh ${LIB_DIR}/utils/read_ini.sh ${PS_COUNT_INI} ${i} condition); do
+    for c in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${PS_COUNT_INI} ${i} condition); do
       conditions=("${conditions[@]}" "${c/:/,}")
     done
     test ${#conditions[@]} -lt 1 && continue
@@ -160,10 +160,10 @@ if [ -f "${PS_AGGREGATE_INI}" ]; then
   for i in $( egrep "^\[.+\]$" ${PS_AGGREGATE_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
     unset aggregate
     unset conditions
-    for a in $(sh ${LIB_DIR}/utils/read_ini.sh ${PS_AGGREGATE_INI} ${i} aggregate); do
+    for a in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${PS_AGGREGATE_INI} ${i} aggregate); do
       aggregate="${a/:/,}"
     done
-    for c in $(sh ${LIB_DIR}/utils/read_ini.sh ${PS_AGGREGATE_INI} ${i} condition); do
+    for c in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${PS_AGGREGATE_INI} ${i} condition); do
       conditions=("${conditions[@]}" "${c/:/,}")
     done
     test "${aggregate}" == "" && continue
@@ -186,7 +186,7 @@ fi
 if [ -f "${FD_COUNT_INI}" ]; then
   for i in $( egrep "^\[.+\]$" ${FD_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
     unset conditions
-    for c in $(sh ${LIB_DIR}/utils/read_ini.sh ${FD_COUNT_INI} ${i} condition); do
+    for c in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${FD_COUNT_INI} ${i} condition); do
       conditions=("${conditions[@]}" "${c/:/,}")
     done
     test ${#conditions[@]} -lt 1 && continue

@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: cpu.sh
+#         FILE: measure_fd_count.sh
 #
-#        USAGE: cpu.sh [-d delimiter] [-c CPU] [-H] [-h]
+#        USAGE: measure_fd_count.sh -c condition [-c condition...] [-d delimiter] [-H] [-h]
 #
-#  DESCRIPTION: Meaures the CPU
+#  DESCRIPTION: Count the number of File Descriptor.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -19,12 +19,14 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-d delimiter] [-c CPU] [-H] [-h]
+  ${0} -c condition [-c condition...] [-d delimiter] [-H] [-h] 
 
-    -d <arg> : Specify delimiter
-    -c <arg> : Specify CPU
-    -H       : Return header only
-    -h       : Get help
+    -d <arg>  : Result delimiter
+                default : \\t
+    -c <arg>  : ps user defined and condition
+                format  : <user-defined>,<condition>
+    -H        : Return header only
+    -h        : Get help
 
 EOF
 exit 0
@@ -33,38 +35,45 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "d:c:Hh" OPT; do
+while getopts "c:d:Hh" OPT; do
   case ${OPT} in
-    d) D="${OPTARG}";;
-    c) C="${OPTARG}";;
+    c) CONDITIONS=("${CONDITIONS[@]}" "${OPTARG}");;
+    d) DELIMITER="${OPTARG}";;
     H) HEAD=1;;
     h|:|\?) usage;;
   esac
 done
-
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
 # Return the Header
 #-------------------------------------------------------------------------------
 if [ "${HEAD}" ]; then
-  mpstat -P ALL | awk -v OFS="${D:-\t}" '
-    $3=="CPU" {
-      print "Time", $4, $5, $6, $7, $8, $9, $10, $11, $12
-    }
-  '
+  echo -en "Time"
+  for condition in "${CONDITIONS[@]}"
+  do
+    echo -en "${DELIMITER:-\t}${condition#*:}"
+  done
+  echo ""
   exit 0
 fi
 
 #-------------------------------------------------------------------------------
 # Measure
 #-------------------------------------------------------------------------------
-mpstat -P ALL 1 1 | \
-  grep -v ^Average | \
-  awk -v CPUNO=${C:-"all"} -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
-    $3==CPUNO {
-      print TIME, $4, $5, $6, $7, $8, $9, $10, $11, $12
-    }
-  '
+
+echo -en "${now_time:-`date +%H:%M:%S`}"
+
+for condition in "${CONDITIONS[@]}"
+do
+  fd_total=0
+  for pid in `ps axo pid=,${condition%%,*}= | awk '/'"${condition#*,}"'/ && $1 != PROCINFO["pid"]{print $1}'`
+  do
+    fd_total=$(( ${fd_total} + `ls -d /proc/${pid}/fd/* 2>/dev/null | wc -l` ))
+  done
+  echo -en "${DELIMITER:-\t}${fd_total}"
+done
+
+echo ""
 
 exit 0

@@ -62,9 +62,9 @@ condition_delimiter=${condition_delimiter:-#}
 test ! -f "${ini_path}" && exit 1
 test ! "${section}" && exit 1
 
-sh ${LIB_DIR}/utils/read_ini.sh "${ini_path}" "${section}" file 1 |
+sh ${TOOL_BIN_DIR}/read_ini.sh "${ini_path}" "${section}" file 1 |
   tr '\r' ${delimiter} | tr '\n' ${delimiter}
-conditions=(`sh ${LIB_DIR}/utils/read_ini.sh "${ini_path}" "${section}" condition`)
+conditions=(`sh ${TOOL_BIN_DIR}/read_ini.sh "${ini_path}" "${section}" condition`)
 echo -n "$(IFS=${condition_delimiter}; echo "${conditions[*]}")"
 
 exit 0

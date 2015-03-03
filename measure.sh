@@ -53,24 +53,24 @@ function search_data_name_list() {
   grep "^${1}${MAP_DELIMITER}" ${MEASURE_MAP} | awk -v FS=${MAP_DELIMITER} '{print $3}' | tr "\n" ' '
 }
 
-export MEASURE_HOME=$(cd $(dirname $0);pwd)
-export LIB_DIR=${MEASURE_HOME}/lib
-export CONF_DIR=${MEASURE_HOME}/conf
+export TOOL_HOME=$(cd $(dirname $0);pwd)
+export TOOL_BIN_DIR=${TOOL_HOME}/bin
+export TOOL_CNF_DIR=${TOOL_HOME}/conf
 
-source ${CONF_DIR}/measure.conf
+source ${TOOL_CNF_DIR}/measure.conf
 
 RESULT_DIR=${RESULT_DIR:-./result-`date +%Y%m%d%H%M%S`}
 INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
-MEASURE_LINE_COUNT_INI=${MEASURE_LINE_COUNT_INI:-${CONF_DIR}/measure_line_count.ini}
-MEASURE_PS_COUNT_INI=${MEASURE_PS_COUNT_INI:-${CONF_DIR}/measure_ps_count.ini}
-MEASURE_PS_AGGREGATE_INI=${MEASURE_PS_AGGREGATE_INI:-${CONF_DIR}/measure_ps_aggregate.ini}
-MEASURE_FD_COUNT_INI=${MEASURE_FD_COUNT_INI:-${CONF_DIR}/measure_fd_count.ini}
+MEASURE_LINE_COUNT_INI=${MEASURE_LINE_COUNT_INI:-${TOOL_CNF_DIR}/measure_line_count.ini}
+MEASURE_PS_COUNT_INI=${MEASURE_PS_COUNT_INI:-${TOOL_CNF_DIR}/measure_ps_count.ini}
+MEASURE_PS_AGGREGATE_INI=${MEASURE_PS_AGGREGATE_INI:-${TOOL_CNF_DIR}/measure_ps_aggregate.ini}
+MEASURE_FD_COUNT_INI=${MEASURE_FD_COUNT_INI:-${TOOL_CNF_DIR}/measure_fd_count.ini}
 
 #-------------------------------------------------------------------------------
 # Use commands check
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/check_commands.sh
+sh ${TOOL_BIN_DIR}/check_commands.sh
 test $? -gt 0 && exit 1
 
 #-------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 #-------------------------------------------------------------------------------
 # Make measure map
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/make/measure_map.sh -d ${MAP_DELIMITER} \
+sh ${TOOL_BIN_DIR}/make_measure_map.sh -d ${MAP_DELIMITER} \
   -l ${MEASURE_LINE_COUNT_INI} \
   -a ${MEASURE_PS_AGGREGATE_INI} \
   -p ${MEASURE_PS_COUNT_INI} \
@@ -141,7 +141,7 @@ EOF
 #-------------------------------------------------------------------------------
 # Create Visualize Tool
 #-------------------------------------------------------------------------------
-sh ${LIB_DIR}/create_chart.sh -o ${RESULT_DIR} -i ${INTERVAL} -d ${MAP_DELIMITER} ${MEASURE_MAP}
+sh ${TOOL_BIN_DIR}/add_measure_tags.sh -o ${RESULT_DIR} -i ${INTERVAL} -d ${MAP_DELIMITER} ${MEASURE_MAP}
 
 while :
 do
@@ -178,7 +178,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/memory.sh -d, >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_memory.sh -d, >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -189,9 +189,9 @@ do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
     if [ "${name}" == "all" ]; then
-      sh ${LIB_DIR}/measure/cpu.sh -d, >> ${RESULT_DIR}/${path} &
+      sh ${TOOL_BIN_DIR}/measure_cpu.sh -d, >> ${RESULT_DIR}/${path} &
     else
-      sh ${LIB_DIR}/measure/cpu.sh -c ${name} -d, >> ${RESULT_DIR}/${path} &
+      sh ${TOOL_BIN_DIR}/measure_cpu.sh -c ${name} -d, >> ${RESULT_DIR}/${path} &
     fi
   done
 
@@ -202,7 +202,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/loadavg.sh -d, >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_loadavg.sh -d, >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -212,7 +212,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/network.sh -i ${name} -d, >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_network.sh -i ${name} -d, >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -222,7 +222,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/diskio.sh -d, ${name} >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_diskio.sh -d, ${name} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -232,7 +232,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-    sh ${LIB_DIR}/measure/diskuse.sh -d, ${name} >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_diskuse.sh -d, ${name} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -242,7 +242,7 @@ do
   do
     path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
     condition="`echo ${line} | cut -d ${MAP_DELIMITER} -f4-`"
-    sh ${LIB_DIR}/measure/line_count.sh -d, ${condition} >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_line_count.sh -d, ${condition} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -256,7 +256,7 @@ do
     for c in ${conditions[@]}; do
       condition_str="${condition_str} -c ${c}"
     done
-    sh ${LIB_DIR}/measure/ps_count.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_ps_count.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -273,7 +273,7 @@ do
     for c in ${conditions[@]}; do
       condition_str="${condition_str} -c ${c}"
     done
-    sh ${LIB_DIR}/measure/ps_aggregate.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_ps_aggregate.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
   done
 
   #-----------------------------------------------------------------------------
@@ -288,7 +288,7 @@ do
     for c in ${conditions[@]}; do
       condition_str="${condition_str} -c ${c}"
     done
-    sh ${LIB_DIR}/measure/fd_count.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
+    sh ${TOOL_BIN_DIR}/measure_fd_count.sh -d, ${condition_str} >> ${RESULT_DIR}/${path} &
   done
 
   wait ${sleep_pid}

@@ -1,11 +1,11 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: processors.sh
+#         FILE: search_network_ifaces.sh
 #
-#        USAGE: processors.sh [-d delimiter][-h]
+#        USAGE: search_network_ifaces.sh [-d delimiter][-h]
 #
-#  DESCRIPTION: Search cpu processor list.
+#  DESCRIPTION: Search network interfacei list.
 #
 #      OPTIONS: see function ’usage’ below
 #
@@ -41,14 +41,9 @@ done
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Search processors
+# Search network interface
 #-------------------------------------------------------------------------------
-rt=$(cat /proc/cpuinfo | grep ^processor | awk -v FS=: '
-  {
-    sub (/[ \t]+$/, "", $2);
-    sub (/^[ \t]+/, "", $2);
-    print $2
-  }')
+rt=$(ls /proc/sys/net/ipv4/conf/ | grep -v all | grep -v default)
 
 echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 
