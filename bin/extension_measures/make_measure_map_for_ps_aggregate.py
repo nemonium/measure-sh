@@ -31,15 +31,15 @@ config = "%s/../../conf/extension_measures.xml" % os.path.abspath(os.path.dirnam
 usage = '''
 Usage:
 
-  {file} [-c config][-d data_dir][-h]
+  %s [-c config][-d data_dir][-h]
 
     -c,--config   : Config file (xml) path
-                    default : {config}
+                    default : %s
     -d,--data_dir : Result data direcotry
                     default : data
     -h            : Get help
 
-'''.format(file = __file__, config = config)
+''' % (__file__, config)
 
 ## Commandline arguments
 #
