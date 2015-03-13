@@ -3,8 +3,8 @@
 #
 #         FILE: measure.sh
 #
-#        USAGE: measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
-#                          [-l path] [-p path] [-a path] [-f path]
+#        USAGE: measure.sh [-o directory][-i interval][-t term][-h][-v][-e]
+#                          [-c extention_measure_config]
 #
 #  DESCRIPTION: Manage each performance measurement script.
 #
@@ -20,7 +20,8 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-o directory] [-i interval] [-t term] [-h] [-v] [-e] [-l path] [-p path] [-a path] [-f path]
+  ${0} [-o directory][-i interval][-t term][-h][-v][-e]
+       [-c extention_measure_config]
 
     -o <arg> : Specify results directory
                Default : '\$(cd \$(dirname \$0);pwd)/result-\`date +%Y%m%d%H%M%S\`'
@@ -30,14 +31,8 @@ Usage:
     -t <arg> : Specify measure term
     -e <arg> : End time.
                See the d option of the date command for format.
-    -l <arg> : line_count ini file path
-               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_line_count.ini'
-    -p <arg> : ps_count ini file path
-               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_ps_count.ini'
-    -a <arg> : ps_aggregate ini file path
-               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_ps_aggregate.ini'
-    -f <arg> : fd_count ini file path
-               Default : '\$(cd \$(dirname \$0);pwd)/conf/measure_fd_count.ini'
+    -c <arg> : extention measures config file
+               default : '\$(cd \$(dirname \$0);pwd)/conf/extension_measures.xml'
     -v       : Verbose
     -h       : Get help
 
@@ -62,10 +57,7 @@ source ${TOOL_CNF_DIR}/measure.conf
 RESULT_DIR=${RESULT_DIR:-./result-`date +%Y%m%d%H%M%S`}
 INTERVAL=${INTERVAL:-5}
 MAP_DELIMITER=${MAP_DELIMITER:-:}
-MEASURE_LINE_COUNT_INI=${MEASURE_LINE_COUNT_INI:-${TOOL_CNF_DIR}/measure_line_count.ini}
-MEASURE_PS_COUNT_INI=${MEASURE_PS_COUNT_INI:-${TOOL_CNF_DIR}/measure_ps_count.ini}
-MEASURE_PS_AGGREGATE_INI=${MEASURE_PS_AGGREGATE_INI:-${TOOL_CNF_DIR}/measure_ps_aggregate.ini}
-MEASURE_FD_COUNT_INI=${MEASURE_FD_COUNT_INI:-${TOOL_CNF_DIR}/measure_fd_count.ini}
+EXTENTION_MEASURES_XML=${EXTENTION_MEASURES_XML:-${TOOL_CNF_DIR}/extension_measures.xml}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -76,12 +68,9 @@ test $? -gt 0 && exit 1
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "l:p:a:f:o:i:t:e:hv" OPT; do
+while getopts "c:o:i:t:e:hv" OPT; do
   case ${OPT} in
-    l) MEASURE_LINE_COUNT_INI="${OPTARG}";;
-    p) MEASURE_PS_COUNT_INI="${OPTARG}";;
-    a) MEASURE_PS_AGGREGATE_INI="${OPTARG}";;
-    f) MEASURE_FD_COUNT_INI="${OPTARG}";;
+    c) EXTENTION_MEASURES_XML="${OPTARG}";;
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
@@ -113,10 +102,7 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 # Make measure map
 #-------------------------------------------------------------------------------
 sh ${TOOL_BIN_DIR}/make_measure_map.sh -d ${MAP_DELIMITER} \
-  -l ${MEASURE_LINE_COUNT_INI} \
-  -a ${MEASURE_PS_AGGREGATE_INI} \
-  -p ${MEASURE_PS_COUNT_INI} \
-  -f ${MEASURE_FD_COUNT_INI} > ${MEASURE_MAP}
+  -c ${EXTENTION_MEASURES_XML} > ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------
 # Vabose

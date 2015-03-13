@@ -3,7 +3,7 @@
 #
 #         FILE: make_measure_map.sh
 #
-#        USAGE: make_measure_map.sh [-a paht][-f path][-p path][-l path][-d delimiter][-h]
+#        USAGE: make_measure_map.sh [-d delimiter][-h][-c extention_measure_config]
 #
 #  DESCRIPTION: Make measure map string
 #
@@ -19,12 +19,10 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-a paht][-f path][-p path][-l path][-d delimiter][-h]
+  ${0} [-d delimiter][-h][-c extention_measure_config]
 
-    -a <arg> : ps_aggregate ini file path
-    -f <arg> : fd_count ini file path
-    -p <arg> : ps_count ini file path
-    -l <arg> : line_count ini file path
+    -c <arg> : extention measures config file
+               default : ../conf/extension_measures.xml
     -d <arg> : Delimiter of Result
                Default : ' ' (space)
     -h       : Get help
@@ -36,12 +34,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "a:p:f:l:d:h" OPT; do
+while getopts "c:d:h" OPT; do
   case ${OPT} in
-    a) PS_AGGREGATE_INI="${OPTARG}";;
-    p) PS_COUNT_INI="${OPTARG}";;
-    f) FD_COUNT_INI="${OPTARG}";;
-    l) LINE_COUNT_INI="${OPTARG}";;
+    c) EXTENTION_MEASURES_XML="${OPTARG}";;
     d) DELIMITER="${OPTARG}";;
     h|:|\?) usage;;
   esac
@@ -51,6 +46,8 @@ shift $(( $OPTIND - 1 ))
 #-------------------------------------------------------------------------------
 # Define Constant
 #-------------------------------------------------------------------------------
+PWD=$(cd $(dirname $0);pwd)
+EXTENTION_MEASURES_XML=${EXTENTION_MEASURES_XML:-${PWD}/../conf/extension_measures.xml}
 DELIMITER=${DELIMITER:- }
 RESULT_DATA_DIR=${RESULT_DATA_DIR:-data}
 FORMAT="%s${DELIMITER}%s${DELIMITER}%s\n"
@@ -103,96 +100,12 @@ printf "${FORMAT}" mount    ${RESULT_DATA_DIR}/mount.${f}.csv    ${i}
 done
 
 #-------------------------------------------------------------------------------
-# search line count groups
-#   Format : line_count:<data_path>:<name>:<target_file>:<pattern>[#<pattern>...]
-#
-#   ex) Input  [dsn]
-#              file=/var/log/maillog
-#              condition=client=
-#              condition=dsn=2
-#              condition=dsn=4
-#              condition=dsn=5
-#       Output line_count:data/line_count.dsn.csv:dsn:/var/log/maillog:client=#dsn=2#dsn=4#dsn=5
+# search extention measures group
+#   Format : See the extension_measures/make_measure_map*.py header.
 #-------------------------------------------------------------------------------
-if [ -f "${LINE_COUNT_INI}" ]; then
-  for i in $( egrep "^\[.+\]$" ${LINE_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
-    test "`sh ${TOOL_BIN_DIR}/line_count_condition.sh ${LINE_COUNT_INI} ${i}`" == "" && continue
-    printf "${FORMAT}" line_count ${RESULT_DATA_DIR}/line_count.${i}.csv \
-      "${i}:`sh ${TOOL_BIN_DIR}/line_count_condition.sh ${LINE_COUNT_INI} ${i}`"
-  done
-fi
-
-#-------------------------------------------------------------------------------
-# search ps count groups
-#   Format : ps_count:<data_path>:<name>:<condition>[#[condition>...]
-#            condition := <user-defined>,<pattern>
-#
-#   ex) Input  [ps]
-#              condition=comm:sendmail
-#              condition=comm:httpd
-#       Output ps_count:data/ps_count.ps.csv:ps:comm,sendmail#comm,httpd
-#-------------------------------------------------------------------------------
-if [ -f "${PS_COUNT_INI}" ]; then
-  for i in $( egrep "^\[.+\]$" ${PS_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
-    unset conditions
-    for c in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${PS_COUNT_INI} ${i} condition); do
-      conditions=("${conditions[@]}" "${c/:/,}")
-    done
-    test ${#conditions[@]} -lt 1 && continue
-    printf "${FORMAT}" ps_count ${RESULT_DATA_DIR}/ps_count.${i}.csv \
-      "${i}:$(IFS=#; echo "${conditions[*]}")"
-  done
-fi
-
-#-------------------------------------------------------------------------------
-# search ps aggregate groups
-#   Format : ps_aggregate:<data_path>:<name>:<aggregate>:<condition>[#[condition>...]
-#            aggregate := <user-defined>[,<format>]
-#            condition := <user-defined>,<pattern>
-#
-#   ex) Input  [mem]
-#              aggregate=pmem:%.1f
-#              condition=comm:httpd
-#              condition=comm:bash
-#       Output ps_aggregate:data/ps_aggregate.mem.csv:mem:pmem,%.1f:comm,httpd#comm,bash
-#-------------------------------------------------------------------------------
-if [ -f "${PS_AGGREGATE_INI}" ]; then
-  for i in $( egrep "^\[.+\]$" ${PS_AGGREGATE_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
-    unset aggregate
-    unset conditions
-    for a in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${PS_AGGREGATE_INI} ${i} aggregate); do
-      aggregate="${a/:/,}"
-    done
-    for c in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${PS_AGGREGATE_INI} ${i} condition); do
-      conditions=("${conditions[@]}" "${c/:/,}")
-    done
-    test "${aggregate}" == "" && continue
-    test ${#conditions[@]} -lt 1 && continue
-    printf "${FORMAT}" ps_aggregate ${RESULT_DATA_DIR}/ps_aggregate.${i}.csv \
-      "${i}:${aggregate}:$(IFS=#; echo "${conditions[*]}")"
-  done
-fi
-
-#-------------------------------------------------------------------------------
-# search fd count groups
-#   Format : fd_count:<data_path>:<name>:<condition>[#[condition>...]
-#            condition := <user-defined>,<pattern>
-#
-#   ex) Input  [fd]
-#              condition=comm:sendmail
-#              condition=comm:httpd
-#       Output fd_count:data/fd_count.fd.csv:fd:comm,sendmail#comm,httpd
-#-------------------------------------------------------------------------------
-if [ -f "${FD_COUNT_INI}" ]; then
-  for i in $( egrep "^\[.+\]$" ${FD_COUNT_INI} | sed "s/^\[\(.*\)\]$/\1/g" ); do
-    unset conditions
-    for c in $(sh ${TOOL_BIN_DIR}/read_ini.sh ${FD_COUNT_INI} ${i} condition); do
-      conditions=("${conditions[@]}" "${c/:/,}")
-    done
-    test ${#conditions[@]} -lt 1 && continue
-    printf "${FORMAT}" fd_count ${RESULT_DATA_DIR}/fd_count.${i}.csv \
-      "${i}:$(IFS=#; echo "${conditions[*]}")"
-  done
-fi
+ls ${TOOL_BIN_DIR}/extension_measures/make_measure_map*.py | while read script
+do
+  python ${script} -c ${EXTENTION_MEASURES_XML}
+done
 
 exit 0
