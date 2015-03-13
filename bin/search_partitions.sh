@@ -1,9 +1,9 @@
 #!/bin/bash
 #===================================================================================
 #
-#         FILE: search_devices.sh
+#         FILE: search_partitions.sh
 #
-#        USAGE: search_devices.sh [-d delimiter][-h]
+#        USAGE: search_partitions.sh [-d delimiter][-h]
 #
 #  DESCRIPTION: Search device list.
 #
@@ -41,15 +41,9 @@ done
 shift $(( $OPTIND - 1 ))
 
 #-------------------------------------------------------------------------------
-# Search devices
+# Search partitions
 #-------------------------------------------------------------------------------
-s_nr=`expr \`iostat -xd | grep -n ^Device: | cut -d: -f1\` + 1`
-e_nr=`iostat -xd  | wc -l`
-rt=$(iostat -xd | awk -v FS=" " -v snr=${s_nr} -v enr=${e_nr} '
-  NR==snr,NR==enr{
-    print $1
-  }' | grep -v '^$')
-
-echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
+partitions=`cat /proc/partitions | awk 'NR>2{print $4}'`
+echo ${partitions[@]} | tr ' ' "${DELIMITER:- }"
 
 exit 0

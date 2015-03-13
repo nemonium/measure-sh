@@ -82,10 +82,10 @@ printf "${FORMAT}" network  ${RESULT_DATA_DIR}/network.${i}.csv  ${i}
 done
 
 #-------------------------------------------------------------------------------
-# search devices
+# search partitions
 #   Format : device:<data_path>:<name>
 #-------------------------------------------------------------------------------
-for i in $( sh ${TOOL_BIN_DIR}/search_devices.sh ); do
+for i in $( sh ${TOOL_BIN_DIR}/search_partitions.sh ); do
 f=`echo ${i} | openssl md5 | sed 's/^.* //'`
 printf "${FORMAT}" device   ${RESULT_DATA_DIR}/device.${f}.csv   ${i}
 done
