@@ -53,6 +53,9 @@ for o, a in opts:
     print usage
     sys.exit()
 
+if os.path.isfile(config) == False:
+  sys.exit()
+
 ## Parse XML
 #
 xdoc = minidom.parse(config)
