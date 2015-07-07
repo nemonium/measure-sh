@@ -1,18 +1,3 @@
-body, input {
-  font-family: monospace;
-}
-
-.btn_on {
-  background-color: salmon;
-}
-
-input {
-  background-color: ghostwhite;
-  border:           1px solid tomato;
-  border-radius:    5px;
-  margin:           3px 1px;
-}
-
 .measure_title {
   width:   100px;
   display: inline-block;
@@ -23,12 +8,8 @@ input {
   display: inline-block;
 }
 
-.btn_all {
-  width:            100%;
-  background-color: white;
-  border:           1px solid gray;
-  border-radius:    5px;
-  margin:           3px 1px;
+.btn_all,.btn_meas_all {
+  width:   100%;
 }
 
 .measure_container {
