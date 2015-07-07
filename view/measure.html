@@ -19,6 +19,8 @@
       if ($(".btn_ps_aggregate").length == 0) $("#menu_ps_aggregate").hide();
       if ($(".btn_fd_count").length == 0) $("#menu_fd_count").hide();
 
+      $(".accordion-toggle").click();
+
       $(".btn_all").click(function() {
         clickAll($(this), $('.btn_meas_all'));
         clickAll($(this), $('.btn_meas'));
@@ -89,103 +91,112 @@
     </script>
   </head>
   <body>
-    <div style="margin: 5px;">
-      <span style="width: 160px; display: inline-block;">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-    </div>
-    <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">Memory</span>
-      <span class="measure_all_span"></span>
-      <!-- ###MEMORY### -->
-    </div>
-    <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">Cpu</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_cpu_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###CPU### -->
-    </div>
-    <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">LoadAverage</span>
-      <span class="measure_all_span"></span>
-      <!-- ###LOAD_AVERAGE### -->
-    </div>
-    <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">Network</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_network_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###NETWORK### -->
-    </div>
-    <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">DiskIO</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_diskio_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###DISK_IO### -->
-    </div>
-    <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">DiskUtil</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_diskutil_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###DISK_UTIL### -->
-    </div>
-    <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">DiskUsage</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_diskuse_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###DISK_USAGE### -->
-    </div>
-    <div id="menu_line_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">Line Count</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_line_count_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###LINE_COUNT### -->
-    </div>
-    <div id="menu_ps_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">Ps Count</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_ps_count_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###PS_COUNT### -->
-    </div>
-    <div id="menu_ps_aggregate" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">Ps Aggregate</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_ps_aggregate_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###PS_AGGREGATE### -->
-    </div>
-    <div id="menu_fd_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-      <span class="measure_title">FD Count</span>
-      <span class="measure_all_span">
-        <span data-toggle="buttons">
-          <label class="btn btn-info btn-xs btn_meas_all btn_fd_count_all"><input type="checkbox"/>All</label>
-        </span>
-      </span>
-      <!-- ###FD_COUNT### -->
+    <div class="accordion-group" style="margin: 5px;">
+      <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" href="#measure_post" style="text-decoration: none; outline: none; color: #31B0D5;"><h3>measure-sh</h3></a>
+      </div>
+      <div id="measure_post" class="accordion-body collapse">
+        <div class="accordion-inner">
+          <div style="margin: 5px;">
+            <span style="width: 160px; display: inline-block;">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">Memory</span>
+            <span class="measure_all_span"></span>
+            <!-- ###MEMORY### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">Cpu</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_cpu_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###CPU### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">LoadAverage</span>
+            <span class="measure_all_span"></span>
+            <!-- ###LOAD_AVERAGE### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">Network</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_network_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###NETWORK### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">DiskIO</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskio_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_IO### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">DiskUtil</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskutil_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_UTIL### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">DiskUsage</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskuse_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_USAGE### -->
+          </div>
+          <div id="menu_line_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">Line Count</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_line_count_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###LINE_COUNT### -->
+          </div>
+          <div id="menu_ps_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">Ps Count</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_ps_count_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###PS_COUNT### -->
+          </div>
+          <div id="menu_ps_aggregate" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">Ps Aggregate</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_ps_aggregate_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###PS_AGGREGATE### -->
+          </div>
+          <div id="menu_fd_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span class="measure_title">FD Count</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_fd_count_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###FD_COUNT### -->
+          </div>
+        </div>
+      </div>
     </div>
     <!-- ###CONTAINER### -->
   </body>
