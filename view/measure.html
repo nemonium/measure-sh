@@ -88,6 +88,25 @@
         clickMeas($(this), createChartOfFdCount);
       });
     });
+    // popover
+    $(document).ready(function(){
+      $('#title_memory').attr('data-content', '<font size=-1>From result of <code>vmstat -s</code>,<br><b>used</b> is <i>used memory</i> - <i>buffer memory</i> - <i>swap cache</i>.<br><b>free</b> is <i>free memory</i> + <i>buffer memory</i> + <i>swap cache</i>.</font>');
+      $('#title_cpu').attr('data-content', '<font size=-1>From result of <code>mpstat -P [cpu] 1 1</code>,<br>Displayed the following values.<br><i>%steal</i>, <i>%soft</i>, <i>%irq</i>, <i>%nice</i>, <i>%iowait</i>, <i>%usr</i>, <i>%sys</i>.<br><br><u>[cpu]</u> is result of <code>cat /proc/cpuinfo</code> and ALL.</font>');
+      $('#title_loadavg').attr('data-content', '<font size=-1>From result of <code>cat /proc/loadavg</code>,<br>First is <b>1min</b>, Second is <b>5min</b>, and Third is <b>15min</b>.</font>');
+      $('#title_network').attr('data-content', '<font size=-1>From result of <code>netstat -I[Iface]</code>,<br><b>rx_ok</b> is (<i>RX-OK</i> - <i>before RX-OK</i>) / <i>interval</i>.<br><b>tx_ok</b> is (<i>TX-OK</i> - <i>before TX-OK</i>) / <i>interval</i>.<br><br><u>[Iface]</u> is result of <code>ifconfig</code></font>');
+      $('#title_diskio').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br><b>rkb_s</b> is <i>rkB/s</i>.<br><b>wkb_s</b> is <i>wkB/s</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
+      $('#title_diskutil').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br><b>disk_util</b> is <i>%util</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
+      $('#title_diskusage').attr('data-content', '<font size=-1>From result of <code>df -P [mounted_dir]</code>,<br>Displayed the following values.<br><i>Used</i>.<br><br><u>[mounted_dir]</u> is result of <code>df -P</code>.</font>');
+      $('#title_line_count').attr('data-content', '<font size=-1>From the specified file, to get the number of rows that match the conditions.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+      $('#title_ps_count').attr('data-content', '<font size=-1>Get the number of processes that match the criteria.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+      $('#title_ps_aggregate').attr('data-content', '<font size=-1>Summarizes the value of the specified item of process that match the criteria.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+      $('#title_fd_count').attr('data-content', '<font size=-1>Get file descriptor of PID for specified conditions.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+
+      $('[data-toggle="popover"]').popover({
+        trigger : 'hover',
+        html: true,
+      });
+    });
     </script>
   </head>
   <body>
@@ -105,12 +124,12 @@
             </span>
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">Memory</span>
+            <span id="title_memory" class="measure_title" data-toggle="popover" title="Memory">Memory</span>
             <span class="measure_all_span"></span>
             <!-- ###MEMORY### -->
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">Cpu</span>
+            <span id="title_cpu" class="measure_title" data-toggle="popover" title="Cpu">Cpu</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_cpu_all"><input type="checkbox"/>All</label>
@@ -119,12 +138,12 @@
             <!-- ###CPU### -->
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">LoadAverage</span>
+            <span id="title_loadavg" class="measure_title" data-toggle="popover" title="LoadAverage">LoadAverage</span>
             <span class="measure_all_span"></span>
             <!-- ###LOAD_AVERAGE### -->
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">Network</span>
+            <span id="title_network" class="measure_title" data-toggle="popover" title="Network">Network</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_network_all"><input type="checkbox"/>All</label>
@@ -133,7 +152,7 @@
             <!-- ###NETWORK### -->
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">DiskIO</span>
+            <span id="title_diskio" class="measure_title" data-toggle="popover" title="DiskIO">DiskIO</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_diskio_all"><input type="checkbox"/>All</label>
@@ -142,7 +161,7 @@
             <!-- ###DISK_IO### -->
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">DiskUtil</span>
+            <span id="title_diskutil" class="measure_title" data-toggle="popover" title="DiskUtil">DiskUtil</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_diskutil_all"><input type="checkbox"/>All</label>
@@ -151,7 +170,7 @@
             <!-- ###DISK_UTIL### -->
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">DiskUsage</span>
+            <span id="title_diskusage" class="measure_title" data-toggle="popover" title="DiskUsage">DiskUsage</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_diskuse_all"><input type="checkbox"/>All</label>
@@ -160,7 +179,7 @@
             <!-- ###DISK_USAGE### -->
           </div>
           <div id="menu_line_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">Line Count</span>
+            <span id="title_line_count" class="measure_title" data-toggle="popover" title="Line Count">Line Count</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_line_count_all"><input type="checkbox"/>All</label>
@@ -169,7 +188,7 @@
             <!-- ###LINE_COUNT### -->
           </div>
           <div id="menu_ps_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">Ps Count</span>
+            <span id="title_ps_count" class="measure_title" data-toggle="popover" title="Ps Count">Ps Count</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_ps_count_all"><input type="checkbox"/>All</label>
@@ -178,7 +197,7 @@
             <!-- ###PS_COUNT### -->
           </div>
           <div id="menu_ps_aggregate" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">Ps Aggregate</span>
+            <span id="title_ps_aggregate" class="measure_title" data-toggle="popover" title="Ps Aggregate">Ps Aggregate</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_ps_aggregate_all"><input type="checkbox"/>All</label>
@@ -187,7 +206,7 @@
             <!-- ###PS_AGGREGATE### -->
           </div>
           <div id="menu_fd_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
-            <span class="measure_title">FD Count</span>
+            <span id="title_fd_count" class="measure_title" data-toggle="popover" title="FD Count">FD Count</span>
             <span class="measure_all_span">
               <span data-toggle="buttons">
                 <label class="btn btn-info btn-xs btn_meas_all btn_fd_count_all"><input type="checkbox"/>All</label>
