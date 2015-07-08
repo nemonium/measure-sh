@@ -43,7 +43,7 @@ shift $(( $OPTIND - 1 ))
 #-------------------------------------------------------------------------------
 # Search network interface
 #-------------------------------------------------------------------------------
-rt=$(ls /proc/sys/net/ipv4/conf/ | grep -v all | grep -v default)
+rt=$(ifconfig | grep -v "^ \|^$" | awk '{print $1}')
 
 echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 
