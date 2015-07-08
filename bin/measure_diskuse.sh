@@ -60,9 +60,7 @@ fi
 MNT=$1
 test ${#MNT} -eq 0 && usage
 
-ret=(`df ${MNT} | awk 'NR>=2 {print}'`)
-test ${#ret} -eq 0 && exit 0
-echo ${ret[@]} | \
+df -P ${MNT} | tail -1 | \
   awk -v OFS="${D:-\t}" -v TIME="${now_time:-`date +%H:%M:%S`}" '
     { print TIME, $2, $3, $4, $5 }
   '
