@@ -43,7 +43,13 @@ shift $(( $OPTIND - 1 ))
 #-------------------------------------------------------------------------------
 # Search network interface
 #-------------------------------------------------------------------------------
-rt=$(ifconfig | grep -v "^ \|^$" | awk '{print $1}')
+rt=()
+for iface in $(ifconfig | grep -v "^ \|^$" | awk '{print $1}')
+do
+  if [ "`netstat -I${iface} | grep ^${iface} | grep -v 'no statistics available'`" != "" ]; then
+    rt=("${rt[@]}" ${iface})
+  fi
+done
 
 echo ${rt[@]} | tr ' ' "${DELIMITER:- }"
 
