@@ -96,7 +96,9 @@ grep "^memory${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
 do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-  add_button 'MEMORY' `echo '<input class="btn_mem" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
+  add_button 'MEMORY' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_mem" target="UUID" src="SRC"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -106,7 +108,9 @@ grep "^cpu${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
 do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-  add_button 'CPU' `echo '<input class="btn_cpu" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
+  add_button 'CPU' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_cpu" target="UUID" src="SRC"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -116,7 +120,9 @@ grep "^loadavg${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
 do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-  add_button 'LOAD_AVERAGE' `echo '<input class="btn_loadavg" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
+  add_button 'LOAD_AVERAGE' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_loadavg" target="UUID" src="SRC"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -126,7 +132,10 @@ grep "^network${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
 do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-  add_button 'NETWORK' `echo '<input class="btn_network" type="button" target="UUID" src="SRC" value="VAL" option="OPT" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s#OPT#${INTERVAL}#g"`
+  add_button 'NETWORK' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_network" target="UUID" src="SRC" option="OPT"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g" | \
+    sed "s#OPT#${INTERVAL}#g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -137,8 +146,12 @@ grep "^device${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
 do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-  add_button 'DISK_IO' `echo '<input class="btn_diskio" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
-  add_button 'DISK_UTIL' `echo '<input class="btn_diskutil" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
+  add_button 'DISK_IO' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_diskio" target="UUID" src="SRC"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g"`
+  add_button 'DISK_UTIL' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_diskutil" target="UUID" src="SRC"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -148,7 +161,9 @@ grep "^mount${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
 do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
-  add_button 'DISK_USAGE' `echo '<input class="btn_diskuse" type="button" target="UUID" src="SRC" value="VAL" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g"`
+  add_button 'DISK_USAGE' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_diskuse" target="UUID" src="SRC"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -159,7 +174,10 @@ do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
   conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f4- | sed 's/\"/\"\"/g'`"
-  add_button 'LINE_COUNT' `echo '<input class="btn_line_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+  add_button 'LINE_COUNT' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_line_count" target="UUID" src="SRC" option="CONDITIONS"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g" | \
+    sed "s&CONDITIONS&${conditions}&g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -170,7 +188,10 @@ do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
   conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f4- | sed 's/\"/\"\"/g'`"
-  add_button 'PS_COUNT' `echo '<input class="btn_ps_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+  add_button 'PS_COUNT' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_ps_count" target="UUID" src="SRC" option="CONDITIONS"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g" | \
+    sed "s&CONDITIONS&${conditions}&g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -181,7 +202,10 @@ do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
   conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f5- | sed 's/\"/\"\"/g'`"
-  add_button 'PS_AGGREGATE' `echo '<input class="btn_ps_aggregate" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+  add_button 'PS_AGGREGATE' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_ps_aggregate" target="UUID" src="SRC" option="CONDITIONS"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g" | \
+    sed "s&CONDITIONS&${conditions}&g"`
 done
 
 #-------------------------------------------------------------------------------
@@ -192,7 +216,10 @@ do
   path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
   name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3`"
   conditions="`echo ${line} | cut -d ${MAP_DELIMITER} -f4- | sed 's/\"/\"\"/g'`"
-  add_button 'FD_COUNT' `echo '<input class="btn_fd_count" type="button" target="UUID" src="SRC" value="VAL" option="CONDITIONS" />' | sed "s#SRC#${path}#g" | sed "s#VAL#${name}#g" | sed "s&CONDITIONS&${conditions}&g"`
+  add_button 'FD_COUNT' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_fd_count" target="UUID" src="SRC" option="CONDITIONS"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g" | \
+    sed "s&CONDITIONS&${conditions}&g"`
 done
 
 exit 0

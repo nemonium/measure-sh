@@ -1,34 +1,29 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <!-- JQuery -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Highcharts -->
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- measure-sh -->
+    <link href="stylesheets/measure.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="javascripts/measure.js"></script>
     <script type="text/javascript">
     $(function() {
-      $(".btn_close_all").click(function() {
-        closeAll($('.btn_mem'));
-        closeAll($('.btn_cpu'));
-        closeAll($('.btn_loadavg'));
-        closeAll($('.btn_network'));
-        closeAll($('.btn_diskio'));
-        closeAll($('.btn_diskutil'));
-        closeAll($('.btn_diskuse'));
-        closeAll($('.btn_line_count'));
-        closeAll($('.btn_ps_count'));
-        closeAll($('.btn_ps_aggregate'));
-        closeAll($('.btn_fd_count'));
+      if ($(".btn_line_count").length == 0) $("#menu_line_count").hide();
+      if ($(".btn_ps_count").length == 0) $("#menu_ps_count").hide();
+      if ($(".btn_ps_aggregate").length == 0) $("#menu_ps_aggregate").hide();
+      if ($(".btn_fd_count").length == 0) $("#menu_fd_count").hide();
 
-        $(".btn_cpu_all").val(OPEN);
-        $(".btn_network_all").val(OPEN);
-        $(".btn_diskio_all").val(OPEN);
-        $(".btn_diskutil_all").val(OPEN);
-        $(".btn_diskuse_all").val(OPEN);
-        $(".btn_line_count_all").val(OPEN);
-        $(".btn_ps_count_all").val(OPEN);
-        $(".btn_ps_aggregate_all").val(OPEN);
-        $(".btn_fd_count_all").val(OPEN);
+      $(".accordion-toggle").click();
+
+      $(".btn_all").click(function() {
+        clickAll($(this), $('.btn_meas_all'));
+        clickAll($(this), $('.btn_meas'));
       });
 
       $(".btn_cpu_all").click(function() {
@@ -60,120 +55,167 @@
       });
 
       $(".btn_mem").click(function() {
-        createChart($(this), createChartOfMemory);
+        clickMeas($(this), createChartOfMemory);
       });
       $(".btn_cpu").click(function() {
-        createChart($(this), createChartOfCpu);
+        clickMeas($(this), createChartOfCpu);
       });
       $(".btn_loadavg").click(function() {
-        createChart($(this), createChartOfLoadavg);
+        clickMeas($(this), createChartOfLoadavg);
       });
       $(".btn_network").click(function() {
-        createChart($(this), createChartOfNetwork);
+        clickMeas($(this), createChartOfNetwork);
       });
       $(".btn_diskio").click(function() {
-        createChart($(this), createChartOfDiskIO);
+        clickMeas($(this), createChartOfDiskIO);
       });
       $(".btn_diskutil").click(function() {
-        createChart($(this), createChartOfDiskUtil);
+        clickMeas($(this), createChartOfDiskUtil);
       });
       $(".btn_diskuse").click(function() {
-        createChart($(this), createChartOfDiskUsage);
+        clickMeas($(this), createChartOfDiskUsage);
       });
       $(".btn_line_count").click(function() {
-        createChart($(this), createChartOfLineCount);
+        clickMeas($(this), createChartOfLineCount);
       });
       $(".btn_ps_count").click(function() {
-        createChart($(this), createChartOfPsCount);
+        clickMeas($(this), createChartOfPsCount);
       });
       $(".btn_ps_aggregate").click(function() {
-        createChart($(this), createChartOfPsAggregate);
+        clickMeas($(this), createChartOfPsAggregate);
       });
       $(".btn_fd_count").click(function() {
-        createChart($(this), createChartOfFdCount);
+        clickMeas($(this), createChartOfFdCount);
+      });
+    });
+    // popover
+    $(document).ready(function(){
+      $('#title_memory').attr('data-content', '<font size=-1>From result of <code>vmstat -s</code>,<br><b>used</b> is <i>used memory</i> - <i>buffer memory</i> - <i>swap cache</i>.<br><b>free</b> is <i>free memory</i> + <i>buffer memory</i> + <i>swap cache</i>.</font>');
+      $('#title_cpu').attr('data-content', '<font size=-1>From result of <code>mpstat -P [cpu] 1 1</code>,<br>Displayed the following values.<br><i>%steal</i>, <i>%soft</i>, <i>%irq</i>, <i>%nice</i>, <i>%iowait</i>, <i>%usr</i>, <i>%sys</i>.<br><br><u>[cpu]</u> is result of <code>cat /proc/cpuinfo</code> and ALL.</font>');
+      $('#title_loadavg').attr('data-content', '<font size=-1>From result of <code>cat /proc/loadavg</code>,<br>First is <b>1min</b>, Second is <b>5min</b>, and Third is <b>15min</b>.</font>');
+      $('#title_network').attr('data-content', '<font size=-1>From result of <code>netstat -I[Iface]</code>,<br><b>rx_ok</b> is (<i>RX-OK</i> - <i>before RX-OK</i>) / <i>interval</i>.<br><b>tx_ok</b> is (<i>TX-OK</i> - <i>before TX-OK</i>) / <i>interval</i>.<br><br><u>[Iface]</u> is result of <code>ifconfig</code></font>');
+      $('#title_diskio').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br><b>rkb_s</b> is <i>rkB/s</i>.<br><b>wkb_s</b> is <i>wkB/s</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
+      $('#title_diskutil').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br><b>disk_util</b> is <i>%util</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
+      $('#title_diskusage').attr('data-content', '<font size=-1>From result of <code>df -P [mounted_dir]</code>,<br>Displayed the following values.<br><i>Used</i>.<br><br><u>[mounted_dir]</u> is result of <code>df -P</code>.</font>');
+      $('#title_line_count').attr('data-content', '<font size=-1>From the specified file, to get the number of rows that match the conditions.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+      $('#title_ps_count').attr('data-content', '<font size=-1>Get the number of processes that match the criteria.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+      $('#title_ps_aggregate').attr('data-content', '<font size=-1>Summarizes the value of the specified item of process that match the criteria.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+      $('#title_fd_count').attr('data-content', '<font size=-1>Get file descriptor of PID for specified conditions.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
+
+      $('[data-toggle="popover"]').popover({
+        trigger : 'hover',
+        html: true,
       });
     });
     </script>
-    <link href="stylesheets/measure.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <div>
-      <span style="width: 160px; display: inline-block;">
-        <input class="btn_all btn_close_all" type="button" value="Close all" />
-      </span>
-    </div>
-    <div>
-      <span class="measure_title">Memory</span>
-      <span class="measure_all_span"></span>
-      <!-- ###MEMORY### -->
-    </div>
-    <div>
-      <span class="measure_title">Cpu</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_cpu_all" type="button" value="Open" />
-      </span>
-      <!-- ###CPU### -->
-    </div>
-    <div>
-      <span class="measure_title">LoadAverage</span>
-      <span class="measure_all_span"></span>
-      <!-- ###LOAD_AVERAGE### -->
-    </div>
-    <div>
-      <span class="measure_title">Network</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_network_all" type="button" value="Open" />
-      </span>
-      <!-- ###NETWORK### -->
-    </div>
-    <div>
-      <span class="measure_title">DiskIO</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_diskio_all" type="button" value="Open" />
-      </span>
-      <!-- ###DISK_IO### -->
-    </div>
-    <div>
-      <span class="measure_title">DiskUtil</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_diskutil_all" type="button" value="Open" />
-      </span>
-      <!-- ###DISK_UTIL### -->
-    </div>
-    <div>
-      <span class="measure_title">DiskUsage</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_diskuse_all" type="button" value="Open" />
-      </span>
-      <!-- ###DISK_USAGE### -->
-    </div>
-    <div>
-      <span class="measure_title">Line Count</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_line_count_all" type="button" value="Open" />
-      </span>
-      <!-- ###LINE_COUNT### -->
-    </div>
-    <div>
-      <span class="measure_title">Ps Count</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_ps_count_all" type="button" value="Open" />
-      </span>
-      <!-- ###PS_COUNT### -->
-    </div>
-    <div>
-      <span class="measure_title">Ps Aggregate</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_ps_aggregate_all" type="button" value="Open" />
-      </span>
-      <!-- ###PS_AGGREGATE### -->
-    </div>
-    <div>
-      <span class="measure_title">FD Count</span>
-      <span class="measure_all_span">
-        <input class="btn_all btn_fd_count_all" type="button" value="Open" />
-      </span>
-      <!-- ###FD_COUNT### -->
+    <div class="accordion-group" style="margin: 5px;">
+      <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" href="#measure_post" style="text-decoration: none; outline: none; color: #31B0D5;"><h3>measure-sh</h3></a>
+      </div>
+      <div id="measure_post" class="accordion-body collapse">
+        <div class="accordion-inner">
+          <div style="margin: 5px;">
+            <span style="width: 160px; display: inline-block;">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_memory" class="measure_title" data-toggle="popover" title="Memory">Memory</span>
+            <span class="measure_all_span"></span>
+            <!-- ###MEMORY### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_cpu" class="measure_title" data-toggle="popover" title="Cpu">Cpu</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_cpu_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###CPU### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_loadavg" class="measure_title" data-toggle="popover" title="LoadAverage">LoadAverage</span>
+            <span class="measure_all_span"></span>
+            <!-- ###LOAD_AVERAGE### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_network" class="measure_title" data-toggle="popover" title="Network">Network</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_network_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###NETWORK### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_diskio" class="measure_title" data-toggle="popover" title="DiskIO">DiskIO</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskio_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_IO### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_diskutil" class="measure_title" data-toggle="popover" title="DiskUtil">DiskUtil</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskutil_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_UTIL### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_diskusage" class="measure_title" data-toggle="popover" title="DiskUsage">DiskUsage</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskuse_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_USAGE### -->
+          </div>
+          <div id="menu_line_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_line_count" class="measure_title" data-toggle="popover" title="Line Count">Line Count</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_line_count_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###LINE_COUNT### -->
+          </div>
+          <div id="menu_ps_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_ps_count" class="measure_title" data-toggle="popover" title="Ps Count">Ps Count</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_ps_count_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###PS_COUNT### -->
+          </div>
+          <div id="menu_ps_aggregate" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_ps_aggregate" class="measure_title" data-toggle="popover" title="Ps Aggregate">Ps Aggregate</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_ps_aggregate_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###PS_AGGREGATE### -->
+          </div>
+          <div id="menu_fd_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_fd_count" class="measure_title" data-toggle="popover" title="FD Count">FD Count</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_fd_count_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###FD_COUNT### -->
+          </div>
+        </div>
+      </div>
     </div>
     <!-- ###CONTAINER### -->
   </body>

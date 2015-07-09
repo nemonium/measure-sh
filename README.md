@@ -11,7 +11,7 @@ Measure the performance of the local host.
 
 ## Usage
     measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
-               [-l path] [-p path] [-a path] [-f path]
+               [-c extention_measure_config]
     
         -o <arg> : Specify results directory
                    Default : '$(cd $(dirname $0);pwd)/result-`date +%Y%m%d%H%M%S`'
@@ -20,14 +20,8 @@ Measure the performance of the local host.
         -t <arg> : Specify measure term
         -e <arg> : End time.
                    See the d option of the date command for format.
-        -l <arg> : line_count ini file path
-                   Default : '$(cd $(dirname $0);pwd)/conf/measure_line_count.ini'
-        -p <arg> : ps_count ini file path
-                   Default : '$(cd $(dirname $0);pwd)/conf/measure_ps_count.ini'
-        -a <arg> : ps_aggregate ini file path
-                   Default : '$(cd $(dirname $0);pwd)/conf/measure_ps_aggregate.ini'
-        -f <arg> : fd_count ini file path
-                   Default : '$(cd $(dirname $0);pwd)/conf/measure_fd_count.ini'
+        -c <arg> : extention measures config file
+                   Default : '$(cd $(dirname $0);pwd)/conf/extension_measures.xml'
         -v       : Verbose
         -h       : Get help
 
@@ -59,39 +53,39 @@ Measure the performance of the local host.
 
 `argument > config > export > default`
 
-### conf/measure_line_count.ini
+### conf/extension_measures.xml
 
-- ex) If you want to aggregate the results of dsn of maillog.
-
-        [dsn]
-        file=/var/log/maillog
-        condition=client=
-        condition=dsn=2
-        condition=dsn=4
-        condition=dsn=5
-
-### conf/measure_ps_count.ini
-
-- ex) If you aggregate the number of sendmail process.
-
-        [process]
-        condition=comm:sendmail
-
-### conf/measure_ps_aggregate.ini
-
-- ex) If you aggregate memory of process.
-
-        [mem]
-        aggregate=pmem:%.1f
-        condition=comm:httpd
-        condition=comm:bash
-
-### conf/measure_fd_count.ini
-
-- ex) If you aggregate the number of sendmail file descriptor.
-
-        [process]
-        condition=comm:sendmail
+        <?xml version="1.0" encoding="UTF-8"?>
+        <extension_measures>
+          <fd_count>
+            <!-- If you aggregate the number of sendmail file descriptor -->
+            <group title="fd">
+              <column user_defined="comm" condition="sendmail" />
+            </group>
+          </fd_count>
+          <line_count>
+            <!-- If you want to aggregate the results of dsn of maillog -->
+            <group title="dsn" file_path="/var/log/maillog">
+              <column condition="client=" />
+              <column condition="dsn=2" />
+              <column condition="dsn=4" />
+              <column condition="dsn=5" />
+            </group>
+          </line_count>
+          <ps_aggregate>
+           <!-- If you aggregate memory of process -->
+            <group title="mem" user_defined="pmem" format="%.1f">
+              <column user_defined="comm" condition="httpd" />
+              <column user_defined="comm" condition="bash" />
+            </group>
+          </ps_aggregate>
+          <ps_count>
+            <!-- If you aggregate the number of sendmail process -->
+            <group title="ps">
+              <column user_defined="comm" condition="sendmail" />
+            </group>
+          </ps_count>
+        </extension_measures>
 
 ## Note
 1. After the script, Transfer measurement results to Local PC.

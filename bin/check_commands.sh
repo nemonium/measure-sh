@@ -70,5 +70,6 @@ which_cmd iostat;  test $? -gt 0 && rt=1
 which_cmd df;      test $? -gt 0 && rt=1
 which_cmd vmstat;  test $? -gt 0 && rt=1
 which_cmd netstat; test $? -gt 0 && rt=1
+which_cmd ifconfig; test $? -gt 0 && rt=1
 
 exit ${rt:-0}
