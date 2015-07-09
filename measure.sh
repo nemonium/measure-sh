@@ -255,7 +255,7 @@ do
     aggregate=( `echo ${line} | cut -d ${MAP_DELIMITER} -f4` )
     conditions=( `echo ${line} | cut -d ${MAP_DELIMITER} -f5- | tr -s '#' ' '` )
     condition_str="-a ${aggregate%%,*}"
-    test "${aggregate#*,}" != "" && condition_str="${condition_str} -f ${aggregate#*,}"
+    test "${aggregate#*,}" != "${aggregate}" && condition_str="${condition_str} -f ${aggregate#*,}"
     for c in ${conditions[@]}; do
       condition_str="${condition_str} -c ${c}"
     done
