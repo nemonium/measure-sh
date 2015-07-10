@@ -86,8 +86,9 @@ done
 #   Format : device:<data_path>:<name>
 #-------------------------------------------------------------------------------
 for i in $( sh ${TOOL_BIN_DIR}/search_partitions.sh ); do
-f=`echo ${i} | openssl md5 | sed 's/^.* //'`
-printf "${FORMAT}" device   ${RESULT_DATA_DIR}/device.${f}.csv   ${i}
+  unset _md5
+  _md5=`echo ${i} | md5sum | awk '{print $1}'`
+  printf "${FORMAT}" device   ${RESULT_DATA_DIR}/device.${_md5}.csv   ${i}
 done
 
 #-------------------------------------------------------------------------------
@@ -95,8 +96,9 @@ done
 #   Format : mount:<data_path>:<name>
 #-------------------------------------------------------------------------------
 for i in $( sh ${TOOL_BIN_DIR}/search_mounted_dir.sh ); do
-f=`echo ${i} | openssl md5 | sed 's/^.* //'`
-printf "${FORMAT}" mount    ${RESULT_DATA_DIR}/mount.${f}.csv    ${i}
+  unset _md5
+  _md5=`echo ${i} | md5sum | awk '{print $1}'`
+  printf "${FORMAT}" mount    ${RESULT_DATA_DIR}/mount.${_md5}.csv    ${i}
 done
 
 #-------------------------------------------------------------------------------
