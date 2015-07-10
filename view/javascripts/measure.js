@@ -573,8 +573,8 @@ function createChartOfDiskIO(filePath, targetId) {
         }
       },
       series: [
-        { name: 'rkb_s', data: rkb_s },
-        { name: 'wkb_s', data: wkb_s },
+        { name: 'rkB/s', data: rkb_s },
+        { name: 'wkB/s', data: wkb_s },
       ]
     });
   });
@@ -739,7 +739,7 @@ function createChartOfDiskUtil(filePath, targetId) {
         }
       },
       series: [
-        { name: 'disk_util', data: p_util },
+        { name: '%util', data: p_util },
       ]
     });
   });
