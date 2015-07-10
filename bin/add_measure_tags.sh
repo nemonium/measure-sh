@@ -163,6 +163,18 @@ do
 done
 
 #-------------------------------------------------------------------------------
+# Add a button for viewing Disk IOPS measure results
+#-------------------------------------------------------------------------------
+grep "^device${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+do
+  path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+  name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+  add_button 'DISK_IOPS' `echo '<span data-toggle="buttons"><label class="btn btn-default btn-xs btn_meas btn_diskiops" target="UUID" src="SRC"><input type="checkbox"/>VAL</label></span>' | \
+    sed "s#SRC#${path}#g" | \
+    sed "s#VAL#${name}#g"`
+done
+
+#-------------------------------------------------------------------------------
 # Add a button for viewing Disk Usage measure results
 #-------------------------------------------------------------------------------
 grep "^mount${MAP_DELIMITER}" ${MEASURE_MAP} | while read line

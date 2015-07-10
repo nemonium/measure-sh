@@ -1081,3 +1081,86 @@ function createChartOfFdCount(filePath, targetId, opt) {
     });
   });
 }
+
+function createChartOfIops(filePath, targetId) {
+  function getArrayMeasures(data) {
+    var rt = [];
+    $.each(data.split('\n'), function() {
+      var m = this.split(',');
+      var o = {
+        time:     m[0],
+        rrqm_s:   m[1],
+        wrpm_s:   m[2],
+        r_s:      m[3],
+        w_s:      m[4],
+        rkb_s:    m[5],
+        wkb_s:    m[6],
+        avgrq_sz: m[7],
+        avgqu_sz: m[8],
+        await:    m[9],
+        svctm:    m[10],
+        p_util:   m[11],
+      };
+      rt.push(o);
+    });
+    return rt;
+  }
+
+  var times;
+  var r_s;
+  var w_s;
+  var optionArray = [];
+  optionArray.push({opt: {url: filePath},
+    func: function(data){
+      var measures = getArrayMeasures(data);
+      times = getMeasuresStr(measures, 'time');
+      r_s = getMeasuresFloat(measures, 'r_s');
+      w_s = getMeasuresFloat(measures, 'w_s');
+  }});
+
+  doOrderGuaranteedAjax(optionArray, function(data){
+    $("#" + targetId).highcharts({
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'IOPS'
+      },
+      subtitle: {
+        text: filePath
+      },
+      xAxis: {
+        categories: times,
+        tickInterval: parseInt(times.length / 10)
+      },
+      yAxis: {
+        title: {
+          text: 'IOPS'
+        },
+        labels: {
+          formatter: function() {
+            return this.value
+          }
+        },
+        min: 0
+      },
+      tooltip: {
+        crosshairs: true,
+        shared: true,
+        valueSuffix: ' IOPS'
+      },
+      plotOptions: {
+        column: {
+          stacking: 'normal',
+          dataLabels: {
+            enabled: false,
+          }
+        }
+      },
+      series: [
+        { name: 'r/s', data: r_s },
+        { name: 'w/s', data: w_s },
+      ]
+    });
+  });
+}

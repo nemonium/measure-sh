@@ -38,6 +38,9 @@
       $(".btn_diskutil_all").click(function() {
         clickAll($(this), $('.btn_diskutil'));
       });
+      $(".btn_diskiops_all").click(function() {
+        clickAll($(this), $('.btn_diskiops'));
+      });
       $(".btn_diskuse_all").click(function() {
         clickAll($(this), $('.btn_diskuse'));
       });
@@ -72,6 +75,9 @@
       $(".btn_diskutil").click(function() {
         clickMeas($(this), createChartOfDiskUtil);
       });
+      $(".btn_diskiops").click(function() {
+        clickMeas($(this), createChartOfIops);
+      });
       $(".btn_diskuse").click(function() {
         clickMeas($(this), createChartOfDiskUsage);
       });
@@ -96,6 +102,7 @@
       $('#title_network').attr('data-content', '<font size=-1>From result of <code>netstat -I[Iface]</code>,<br><b>rx_ok</b> is (<i>RX-OK</i> - <i>before RX-OK</i>) / <i>interval</i>.<br><b>tx_ok</b> is (<i>TX-OK</i> - <i>before TX-OK</i>) / <i>interval</i>.<br><br><u>[Iface]</u> is result of <code>ifconfig</code></font>');
       $('#title_diskio').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br>Displayed the following values.<br><i>rkB/s</i>, <i>wkB/s</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
       $('#title_diskutil').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br>Displayed the following values.<br><i>%util</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
+      $('#title_diskiops').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br><b>IOPS</b> is <i>r/s</i> + <i>w/s</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
       $('#title_diskusage').attr('data-content', '<font size=-1>From result of <code>df -P [mounted_dir]</code>,<br>Displayed the following values.<br><i>Used</i>.<br><br><u>[mounted_dir]</u> is result of <code>df -P</code>.</font>');
       $('#title_line_count').attr('data-content', '<font size=-1>From the specified file, to get the number of rows that match the conditions.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
       $('#title_ps_count').attr('data-content', '<font size=-1>Get the number of processes that match the criteria.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
@@ -168,6 +175,15 @@
               </span>
             </span>
             <!-- ###DISK_UTIL### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_diskiops" class="measure_title" data-toggle="popover" title="IOPS">IOPS</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskiops_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_IOPS### -->
           </div>
           <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
             <span id="title_diskusage" class="measure_title" data-toggle="popover" title="Disk-Usage">Disk-Usage</span>
