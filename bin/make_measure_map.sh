@@ -70,7 +70,7 @@ printf "${FORMAT}" loadavg  ${RESULT_DATA_DIR}/loadavg.csv       LoadAverage
 #-------------------------------------------------------------------------------
 printf "${FORMAT}" cpu      ${RESULT_DATA_DIR}/cpu.all.csv       all
 for i in $( sh ${TOOL_BIN_DIR}/search_processors.sh ); do
-printf "${FORMAT}" cpu      ${RESULT_DATA_DIR}/cpu.${i}.csv      ${i}
+  printf "${FORMAT}" cpu      ${RESULT_DATA_DIR}/cpu.${i}.csv      ${i}
 done
 
 #-------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ done
 #   Format : network:<data_path>:<name>
 #-------------------------------------------------------------------------------
 for i in $( sh ${TOOL_BIN_DIR}/search_network_ifaces.sh ); do
-printf "${FORMAT}" network  ${RESULT_DATA_DIR}/network.${i}.csv  ${i}
+  printf "${FORMAT}" network  ${RESULT_DATA_DIR}/network.${i}.csv  ${i}
 done
 
 #-------------------------------------------------------------------------------
@@ -94,11 +94,15 @@ done
 #-------------------------------------------------------------------------------
 # search mounted directories
 #   Format : mount:<data_path>:<name>
+# ~~~~~
+# search mounted directories inode
+#   Format : inode:<data_path>:<name>
 #-------------------------------------------------------------------------------
 for i in $( sh ${TOOL_BIN_DIR}/search_mounted_dir.sh ); do
   unset _md5
   _md5=`echo ${i} | md5sum | awk '{print $1}'`
   printf "${FORMAT}" mount    ${RESULT_DATA_DIR}/mount.${_md5}.csv    ${i}
+  printf "${FORMAT}" inode    ${RESULT_DATA_DIR}/inode.${_md5}.csv    ${i}
 done
 
 #-------------------------------------------------------------------------------

@@ -1164,3 +1164,80 @@ function createChartOfIops(filePath, targetId) {
     });
   });
 }
+
+function createChartOfDiskInode(filePath, targetId) {
+  function getArrayMeasures(data) {
+    var rt = [];
+    $.each(data.split('\n'), function() {
+      var m = this.split(',');
+      var o = {
+        time:      m[0],
+        nodes:     m[1],
+        used:      m[2],
+        free:      m[3],
+        p_use:     m[4],
+      };
+      rt.push(o);
+    });
+    return rt;
+  }
+
+  var times;
+  var used;
+  var optionArray = [];
+  optionArray.push({opt: {url: filePath},
+    func: function(data){
+      var measures = getArrayMeasures(data);
+      times = getMeasuresStr(measures, 'time');
+      used  = getMeasuresFloat(measures, 'used');
+  }});
+
+  doOrderGuaranteedAjax(optionArray, function(data){
+    $("#" + targetId).highcharts({
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: 'inode'
+      },
+      subtitle: {
+        text: filePath
+      },
+      xAxis: {
+        title: {
+          text: 'Time'
+        },
+        categories: times,
+        tickInterval: parseInt(times.length / 10)
+      },
+      yAxis: {
+        title: {
+          text: 'inode'
+        },
+        labels: {
+          formatter: function() {
+            return this.value
+          }
+        },
+        min: 0
+      },
+      tooltip: {
+        crosshairs: true,
+        shared: true,
+      },
+      plotOptions: {
+        spline: {
+          marker: {
+            enabled: false,
+            radius: 4,
+            lineColor: '#666666',
+            lineWidth: 1
+          }
+        }
+      },
+      series: [
+        { name: 'IUsed', data: used },
+      ]
+    });
+  });
+}

@@ -222,6 +222,16 @@ do
   done
 
   #-----------------------------------------------------------------------------
+  # inode
+  #-----------------------------------------------------------------------------
+  grep "^inode${MAP_DELIMITER}" ${MEASURE_MAP} | while read line
+  do
+    path="`echo ${line} | cut -d ${MAP_DELIMITER} -f2`"
+    name="`echo ${line} | cut -d ${MAP_DELIMITER} -f3-`"
+    sh ${TOOL_BIN_DIR}/measure_diskuse.sh -i -d, ${name} >> ${RESULT_DIR}/${path} &
+  done
+
+  #-----------------------------------------------------------------------------
   # Count the specific line in the file
   #-----------------------------------------------------------------------------
   grep "^line_count${MAP_DELIMITER}" ${MEASURE_MAP} | while read line

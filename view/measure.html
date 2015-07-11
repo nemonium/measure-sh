@@ -44,6 +44,9 @@
       $(".btn_diskuse_all").click(function() {
         clickAll($(this), $('.btn_diskuse'));
       });
+      $(".btn_diskinode_all").click(function() {
+        clickAll($(this), $('.btn_diskinode'));
+      });
       $(".btn_line_count_all").click(function() {
         clickAll($(this), $('.btn_line_count'));
       });
@@ -81,6 +84,9 @@
       $(".btn_diskuse").click(function() {
         clickMeas($(this), createChartOfDiskUsage);
       });
+      $(".btn_diskinode").click(function() {
+        clickMeas($(this), createChartOfDiskInode);
+      });
       $(".btn_line_count").click(function() {
         clickMeas($(this), createChartOfLineCount);
       });
@@ -104,6 +110,7 @@
       $('#title_diskutil').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br>Displayed the following values.<br><i>%util</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
       $('#title_diskiops').attr('data-content', '<font size=-1>From last result of <code>iostat -kxd [partition] 5 2</code>,<br><b>IOPS</b> is <i>r/s</i> + <i>w/s</i>.<br><br><u>[partition]</u> is result of <code>cat /proc/partitions</code>.</font>');
       $('#title_diskusage').attr('data-content', '<font size=-1>From result of <code>df -P [mounted_dir]</code>,<br>Displayed the following values.<br><i>Used</i>.<br><br><u>[mounted_dir]</u> is result of <code>df -P</code>.</font>');
+      $('#title_diskinode').attr('data-content', '<font size=-1>From result of <code>df -i -P [mounted_dir]</code>,<br>Displayed the following values.<br><i>IUsed</i>.<br><br><u>[mounted_dir]</u> is result of <code>df -P</code>.</font>');
       $('#title_line_count').attr('data-content', '<font size=-1>From the specified file, to get the number of rows that match the conditions.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
       $('#title_ps_count').attr('data-content', '<font size=-1>Get the number of processes that match the criteria.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
       $('#title_ps_aggregate').attr('data-content', '<font size=-1>Summarizes the value of the specified item of process that match the criteria.<br>For more information, please refer to <b>conf/extension_measures.xml</b>.</font>');
@@ -193,6 +200,15 @@
               </span>
             </span>
             <!-- ###DISK_USAGE### -->
+          </div>
+          <div style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
+            <span id="title_diskinode" class="measure_title" data-toggle="popover" title="inode">inode</span>
+            <span class="measure_all_span">
+              <span data-toggle="buttons">
+                <label class="btn btn-info btn-xs btn_meas_all btn_diskinode_all"><input type="checkbox"/>All</label>
+              </span>
+            </span>
+            <!-- ###DISK_INODE### -->
           </div>
           <div id="menu_line_count" style="margin: 5px; padding: 2px; border-bottom-style: solid; border-width: 1px; border-color: Silver;">
             <span id="title_line_count" class="measure_title" data-toggle="popover" title="Line Count">Line Count</span>
