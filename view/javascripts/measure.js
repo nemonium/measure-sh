@@ -1147,7 +1147,6 @@ function createChartOfIops(filePath, targetId) {
       tooltip: {
         crosshairs: true,
         shared: true,
-        valueSuffix: ' IOPS'
       },
       plotOptions: {
         column: {
