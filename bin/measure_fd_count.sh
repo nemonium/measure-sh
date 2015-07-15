@@ -67,7 +67,7 @@ echo -en "${now_time:-`date +%H:%M:%S`}"
 for condition in "${CONDITIONS[@]}"
 do
   fd_total=0
-  for pid in `ps axo pid=,${condition%%,*}= | awk '/'"${condition#*,}"'/ && $1 != PROCINFO["pid"]{print $1}'`
+  for pid in `ps axo pid=,${condition%%,*}= | awk '$2 ~ /'"${condition#*,}"'/ && $1 != PROCINFO["pid"]{print $1}'`
   do
     fd_total=$(( ${fd_total} + `ls -d /proc/${pid}/fd/* 2>/dev/null | wc -l` ))
   done
