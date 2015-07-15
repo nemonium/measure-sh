@@ -8,6 +8,7 @@ Measure the performance of the local host.
 - df
 - vmstat
 - netstat
+- ifconfig
 
 ## Usage
     measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
@@ -46,10 +47,10 @@ Measure the performance of the local host.
 
 - RESULT_DIR
 - INTERVAL
-- MAP_DELIMITER
 - MEASURE_TERM
 - END_TIME
 - VERBOSE
+- EXTENTION_MEASURES_XML
 
 `argument > config > export > default`
 

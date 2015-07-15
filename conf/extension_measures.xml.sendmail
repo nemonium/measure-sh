@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension_measures>
+  <!--fd_count>
+    <group title="fd">
+      <column user_defined="comm" condition="sendmail" />
+      <column user_defined="comm" condition="httpd" />
+    </group>
+  </fd_count-->
+  <line_count>
+    <group title="dsn" file_path="/var/log/maillog">
+      <column condition="dsn=2" />
+      <column condition="dsn=4" />
+      <column condition="dsn=5" />
+    </group>
+  </line_count>
+  <ps_aggregate>
+    <group title="pcpu" user_defined="pcpu" format="%.1f">
+      <column user_defined="comm" condition="sendmail$" />
+      <column user_defined="comm" condition="postmaster$" />
+    </group>
+    <group title="pmem" user_defined="pmem" format="%.1f">
+      <column user_defined="comm" condition="sendmail$" />
+      <column user_defined="comm" condition="postmaster$" />
+    </group>
+    <group title="rss" user_defined="rss">
+      <column user_defined="comm" condition="sendmail$" />
+      <column user_defined="comm" condition="postmaster$" />
+    </group>
+    <group title="rsz" user_defined="rsz">
+      <column user_defined="comm" condition="sendmail$" />
+      <column user_defined="comm" condition="postmaster$" />
+    </group>
+  </ps_aggregate>
+  <ps_count>
+    <group title="sendmail-process">
+      <column user_defined="comm" condition="sendmail$" />
+      <column user_defined="comm" condition="postmaster$" />
+    </group>
+  </ps_count>
+</extension_measures>

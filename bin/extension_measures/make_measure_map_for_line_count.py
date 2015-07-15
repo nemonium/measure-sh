@@ -22,38 +22,32 @@ from xml.dom import minidom
 ## Define
 #
 measure_map_format = "line_count:%s:%s:%s:%s"
-
-data_dir = "data"
-config = "%s/../../conf/extension_measures.xml" % os.path.abspath(os.path.dirname(__file__))
+config = ""
 
 ## Usage
 #
 usage = '''
 Usage:
 
-  %s [-c config][-d data_dir][-h]
+  %s [-h] -c config
 
-    -c,--config   : Config file (xml) path
-                    default : %s
-    -d,--data_dir : Result data direcotry
-                    default : data
+    -c,--config   : extention measures config file (require)
     -h            : Get help
 
-''' % (__file__, config)
+''' % (__file__)
 
 ## Commandline arguments
 #
-opts, args = getopt.getopt(sys.argv[1:], "c:d:h", ["config=", "data_dir=", "help"])
+opts, args = getopt.getopt(sys.argv[1:], "c:h", ["config=", "help"])
 for o, a in opts:
   if o in ("-c", "--config"):
     config = a
-  elif o in ("-d", "--data_dir"):
-    data_dir = a
   elif o in ("-h", "--help"):
     print usage
     sys.exit()
 
 if os.path.isfile(config) == False:
+  print >> sys.stderr, 'config not found.'
   sys.exit()
 
 ## Parse XML
@@ -74,5 +68,5 @@ for g in elems[0].getElementsByTagName("group"):
       column = column + "#"
     initialized = 1
     column = column + '%s' % (c.getAttribute("condition"))
-  data_path = "%s/line_count.%s.csv" % (data_dir, title)
+  data_path = "data/line_count.%s.csv" % (title)
   print measure_map_format % (data_path, title, file_path, column)
