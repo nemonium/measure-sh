@@ -4,7 +4,7 @@
 #         FILE: measure.sh
 #
 #        USAGE: measure.sh [-o directory][-i interval][-t term][-h][-v][-e]
-#                          [-c extention_measure_config]
+#                          [-E extention_measure_config]
 #
 #  DESCRIPTION: Manage each performance measurement script.
 #
@@ -21,7 +21,7 @@ cat << EOF
 Usage:
 
   ${0} [-o directory][-i interval][-t term][-h][-v][-e]
-       [-c extention_measure_config]
+       [-E extention_measure_config]
 
     -o <arg> : Specify results directory
                Default : './result-\`date +%Y%m%d%H%M%S\`'
@@ -31,8 +31,7 @@ Usage:
     -t <arg> : Specify measure term
     -e <arg> : End time.
                See the d option of the date command for format.
-    -c <arg> : extention measures config file
-               default : '\$(cd \$(dirname \$0);pwd)/conf/extension_measures.xml'
+    -E <arg> : Extention measures config file path.
     -v       : Verbose
     -h       : Get help
 
@@ -58,7 +57,6 @@ source ${TOOL_HOME}/conf/measure.conf
 
 RESULT_DIR=${RESULT_DIR:-./result-`date +%Y%m%d%H%M%S`}
 INTERVAL=${INTERVAL:-5}
-EXTENTION_MEASURES_XML=${EXTENTION_MEASURES_XML:-${TOOL_HOME}/conf/extension_measures.xml}
 
 #-------------------------------------------------------------------------------
 # Use commands check
@@ -69,9 +67,9 @@ test $? -gt 0 && exit 1
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "c:o:i:t:e:hv" OPT; do
+while getopts "E:o:i:t:e:hv" OPT; do
   case ${OPT} in
-    c) EXTENTION_MEASURES_XML="${OPTARG}";;
+    E) EXTENTION_MEASURES_XML="${OPTARG}";;
     o) RESULT_DIR="${OPTARG}";;
     i) INTERVAL="${OPTARG}";;
     t) MEASURE_TERM="${OPTARG}";;
@@ -103,7 +101,7 @@ MEASURE_MAP=${RESULT_DIR}/measure-map
 # Make measure map
 # Create Visualize Tool
 #-------------------------------------------------------------------------------
-sh make_measure_map.sh -c ${EXTENTION_MEASURES_XML} > ${MEASURE_MAP}
+sh make_measure_map.sh -E "${EXTENTION_MEASURES_XML}" > ${MEASURE_MAP}
 sh add_measure_tags.sh -o ${RESULT_DIR} -i ${INTERVAL} ${MEASURE_MAP}
 
 #-------------------------------------------------------------------------------

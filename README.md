@@ -12,7 +12,7 @@ Measure the performance of the local host.
 
 ## Usage
     measure.sh [-o directory] [-i interval] [-t term] [-h] [-v] [-e]
-               [-c extention_measure_config]
+               [-E extention_measure_config]
     
         -o <arg> : Specify results directory
                    Default : '$(cd $(dirname $0);pwd)/result-`date +%Y%m%d%H%M%S`'
@@ -21,8 +21,7 @@ Measure the performance of the local host.
         -t <arg> : Specify measure term
         -e <arg> : End time.
                    See the d option of the date command for format.
-        -c <arg> : extention measures config file
-                   Default : '$(cd $(dirname $0);pwd)/conf/extension_measures.xml'
+        -E <arg> : Extention measures config file path.
         -v       : Verbose
         -h       : Get help
 

@@ -19,9 +19,9 @@ function usage() {
 cat << EOF
 Usage:
 
-  ${0} [-h][-c extention_measure_config]
+  ${0} [-h][-E extention_measure_config]
 
-    -c <arg> : extention measures config file
+    -E <arg> : extention measures config file
     -h       : Get help
 
 EOF
@@ -31,9 +31,9 @@ exit 0
 #-------------------------------------------------------------------------------
 # Parameter check
 #-------------------------------------------------------------------------------
-while getopts "c:h" OPT; do
+while getopts "E:h" OPT; do
   case ${OPT} in
-    c) EXTENTION_MEASURES_XML="${OPTARG}";;
+    E) EXTENTION_MEASURES_XML="${OPTARG}";;
     h|:|\?) usage;;
   esac
 done
